@@ -4355,7 +4355,8 @@ type OrderLine implements Node {
   id: ID!
   productName: String!
   variantName: String!
-  productSku: String!
+  productSku: String
+  productId: String
   isShippingRequired: Boolean!
   quantity: Int!
   quantityFulfilled: Int!
@@ -5319,6 +5320,7 @@ enum ProductFieldEnum {
   COLLECTIONS
   CHARGE_TAXES
   PRODUCT_MEDIA
+  VARIANT_ID
   VARIANT_SKU
   VARIANT_WEIGHT
   VARIANT_MEDIA
