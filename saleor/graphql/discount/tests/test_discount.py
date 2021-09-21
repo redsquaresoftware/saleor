@@ -1,5 +1,5 @@
 from datetime import timedelta
-from unittest.mock import ANY
+from unittest.mock import ANY, patch
 
 import graphene
 import pytest
@@ -891,7 +891,10 @@ def test_voucher_remove_no_catalogues(
     assert voucher.collections.exists()
 
 
-def test_create_sale(staff_api_client, permission_manage_discounts):
+@patch("saleor.plugins.manager.PluginsManager.sale_created")
+def test_create_sale(
+    created_webhook_mock, staff_api_client, permission_manage_discounts
+):
     query = """
     mutation  saleCreate(
             $type: DiscountValueTypeEnum, $name: String, $value: PositiveDecimal,
@@ -932,6 +935,9 @@ def test_create_sale(staff_api_client, permission_manage_discounts):
     assert data["name"] == "test sale"
     assert data["startDate"] == start_date.isoformat()
     assert data["endDate"] == end_date.isoformat()
+
+    sale = Sale.objects.first()
+    created_webhook_mock.assert_called_once_with(sale)
 
 
 def test_create_sale_with_enddate_before_startdate(
@@ -979,7 +985,10 @@ def test_create_sale_with_enddate_before_startdate(
     assert errors
 
 
-def test_update_sale(staff_api_client, sale, permission_manage_discounts):
+@patch("saleor.plugins.manager.PluginsManager.sale_updated")
+def test_update_sale(
+    updated_webhook_mock, staff_api_client, sale, permission_manage_discounts
+):
     query = """
     mutation  saleUpdate($type: DiscountValueTypeEnum, $id: ID!) {
             saleUpdate(id: $id, input: {type: $type}) {
@@ -1009,8 +1018,13 @@ def test_update_sale(staff_api_client, sale, permission_manage_discounts):
     data = content["data"]["saleUpdate"]["sale"]
     assert data["type"] == DiscountValueType.PERCENTAGE.upper()
 
+    updated_webhook_mock.assert_called_once_with(sale)
 
-def test_sale_delete_mutation(staff_api_client, sale, permission_manage_discounts):
+
+@patch("saleor.plugins.manager.PluginsManager.sale_deleted")
+def test_sale_delete_mutation(
+    deleted_webhook_mock, staff_api_client, sale, permission_manage_discounts
+):
     query = """
         mutation DeleteSale($id: ID!) {
             saleDelete(id: $id) {
@@ -1034,6 +1048,7 @@ def test_sale_delete_mutation(staff_api_client, sale, permission_manage_discount
     content = get_graphql_content(response)
     data = content["data"]["saleDelete"]
     assert data["sale"]["name"] == sale.name
+    deleted_webhook_mock.assert_called_once_with(sale)
     with pytest.raises(sale._meta.model.DoesNotExist):
         sale.refresh_from_db()
 
