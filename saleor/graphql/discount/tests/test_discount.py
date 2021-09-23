@@ -1067,8 +1067,15 @@ def test_sale_delete_mutation(
         sale.refresh_from_db()
 
 
+@patch("saleor.plugins.manager.PluginsManager.sale_updated")
 def test_sale_add_catalogues(
-    staff_api_client, sale, category, product, collection, permission_manage_discounts
+    updated_webhook_mock,
+    staff_api_client,
+    sale,
+    category,
+    product,
+    collection,
+    permission_manage_discounts,
 ):
     query = """
         mutation saleCataloguesAdd($id: ID!, $input: CatalogueInput!) {
@@ -1084,6 +1091,9 @@ def test_sale_add_catalogues(
             }
         }
     """
+    previous_catalogue = convert_catalogue_info_to_global_ids(
+        fetch_catalogue_info(sale)
+    )
     product_id = graphene.Node.to_global_id("Product", product.id)
     collection_id = graphene.Node.to_global_id("Collection", collection.id)
     category_id = graphene.Node.to_global_id("Category", category.id)
@@ -1099,6 +1109,7 @@ def test_sale_add_catalogues(
     response = staff_api_client.post_graphql(
         query, variables, permissions=[permission_manage_discounts]
     )
+    current_catalogue = convert_catalogue_info_to_global_ids(fetch_catalogue_info(sale))
     content = get_graphql_content(response)
     data = content["data"]["saleCataloguesAdd"]
 
@@ -1106,6 +1117,10 @@ def test_sale_add_catalogues(
     assert product in sale.products.all()
     assert category in sale.categories.all()
     assert collection in sale.collections.all()
+
+    updated_webhook_mock.assert_called_once_with(
+        sale, previous_catalogue=previous_catalogue, current_catalogue=current_catalogue
+    )
 
 
 def test_sale_add_catalogues_with_product_without_variants(
@@ -1148,8 +1163,15 @@ def test_sale_add_catalogues_with_product_without_variants(
     assert error["message"] == "Cannot manage products without variants."
 
 
+@patch("saleor.plugins.manager.PluginsManager.sale_updated")
 def test_sale_remove_catalogues(
-    staff_api_client, sale, category, product, collection, permission_manage_discounts
+    updated_webhook_mock,
+    staff_api_client,
+    sale,
+    category,
+    product,
+    collection,
+    permission_manage_discounts,
 ):
     sale.products.add(product)
     sale.collections.add(collection)
@@ -1169,6 +1191,9 @@ def test_sale_remove_catalogues(
             }
         }
     """
+    previous_catalogue = convert_catalogue_info_to_global_ids(
+        fetch_catalogue_info(sale)
+    )
     product_id = graphene.Node.to_global_id("Product", product.id)
     collection_id = graphene.Node.to_global_id("Collection", collection.id)
     category_id = graphene.Node.to_global_id("Category", category.id)
@@ -1184,6 +1209,8 @@ def test_sale_remove_catalogues(
     response = staff_api_client.post_graphql(
         query, variables, permissions=[permission_manage_discounts]
     )
+    current_catalogue = convert_catalogue_info_to_global_ids(fetch_catalogue_info(sale))
+
     content = get_graphql_content(response)
     data = content["data"]["saleCataloguesRemove"]
 
@@ -1191,6 +1218,10 @@ def test_sale_remove_catalogues(
     assert product not in sale.products.all()
     assert category not in sale.categories.all()
     assert collection not in sale.collections.all()
+
+    updated_webhook_mock.assert_called_once_with(
+        sale, previous_catalogue=previous_catalogue, current_catalogue=current_catalogue
+    )
 
 
 def test_sale_add_no_catalogues(
