@@ -388,7 +388,7 @@ TEST_RUNNER = "saleor.tests.runner.PytestTestRunner"
 PLAYGROUND_ENABLED = get_bool_from_env("PLAYGROUND_ENABLED", True)
 
 # To update domain name update here
-ALLOWED_HOSTS = get_list(os.environ.get("ALLOWED_HOSTS", "localhost, 127.0.0.1, api.saleor.mywheels.com.my, dashboard.saleor.mywheels.com.my, storefront.saleor.mywheels.com.my"))
+ALLOWED_HOSTS = get_list(os.environ.get("ALLOWED_HOSTS", "localhost, 127.0.0.1, api.saleor.mywheels.com.my, dashboard.saleor.mywheels.com.my, storefront.saleor.mywheels.com.my, saleor.mywheels.com.my"))
 ALLOWED_GRAPHQL_ORIGINS = get_list(os.environ.get("ALLOWED_GRAPHQL_ORIGINS", "*"))
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
