@@ -218,3 +218,6 @@ websockets==8.1; python_full_version >= "3.6.1"
 wrapt==1.12.1; python_version >= "3.6" and python_version < "4.0"
 yarl==1.7.0; python_version >= "3.6"
 zopfli==0.1.8; python_version >= "3.6"
+
+# my stuff
+cryptography==3.4.7
