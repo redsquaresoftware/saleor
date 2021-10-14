@@ -13,8 +13,14 @@ from .plugins.views import (
 )
 from .product.views import digital_product
 
+from saleor.cognito_auth_layer.views import AuthenticatedGraphQLView
+
 urlpatterns = [
-    url(r"^graphql/$", csrf_exempt(GraphQLView.as_view(schema=schema)), name="api"),
+    url(
+        r"^graphql/$",
+        csrf_exempt(AuthenticatedGraphQLView.as_view(schema=schema)),
+        name="api",
+    ),
     url(
         r"^digital-download/(?P<token>[0-9A-Za-z_\-]+)/$",
         digital_product,
