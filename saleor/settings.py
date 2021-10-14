@@ -25,6 +25,10 @@ from .core.languages import LANGUAGES as CORE_LANGUAGES
 import json
 from urllib import request
 
+from dotenv import load_dotenv
+
+load_dotenv()  # take environment variables from .env.
+
 
 def get_list(text):
     return [item.strip() for item in text.split(",")]
@@ -317,9 +321,7 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "verbose" if DEBUG else "celery_task_json",
         },
-        "null": {
-            "class": "logging.NullHandler",
-        },
+        "null": {"class": "logging.NullHandler",},
     },
     "loggers": {
         "django": {"level": "INFO", "propagate": True},
@@ -392,7 +394,12 @@ TEST_RUNNER = "saleor.tests.runner.PytestTestRunner"
 PLAYGROUND_ENABLED = get_bool_from_env("PLAYGROUND_ENABLED", True)
 
 # To update domain name update here
-ALLOWED_HOSTS = get_list(os.environ.get("ALLOWED_HOSTS", "localhost, 127.0.0.1, api.saleor.mywheels.com.my, dashboard.saleor.mywheels.com.my, storefront.saleor.mywheels.com.my, saleor.mywheels.com.my"))
+ALLOWED_HOSTS = get_list(
+    os.environ.get(
+        "ALLOWED_HOSTS",
+        "localhost, 127.0.0.1, api.saleor.mywheels.com.my, dashboard.saleor.mywheels.com.my, storefront.saleor.mywheels.com.my, saleor.mywheels.com.my",
+    )
+)
 ALLOWED_GRAPHQL_ORIGINS = get_list(os.environ.get("ALLOWED_GRAPHQL_ORIGINS", "*"))
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
