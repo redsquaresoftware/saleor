@@ -32,5 +32,6 @@ def get_saleor_jwt(email):
 
         return mapped.saleor_jwt
 
-    except:
+    except Exception as e:
+        print("Error in get_saleor_jwt: ", e)
         return None

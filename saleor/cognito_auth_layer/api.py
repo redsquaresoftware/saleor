@@ -55,7 +55,7 @@ def create_new_user(email, password):
     error = safe_get(result, "data", "accountRegister", "accountError")
 
     if error is not None:
-        raise Exception("User cannot be registered.")
+        raise Exception("User cannot be registered for user: ", email)
 
 
 def create_saleor_access_token(email, password):
@@ -83,7 +83,7 @@ def create_saleor_access_token(email, password):
     token = safe_get(result, "data", "tokenCreate", "token")
 
     if token is None:
-        raise Exception("User's token cannot be generated.")
+        raise Exception("User's token cannot be generated for user: ", email)
 
     return token
 
