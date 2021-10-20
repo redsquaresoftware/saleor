@@ -227,7 +227,9 @@ INSTALLED_APPS = [
     "django_countries",
     "django_filters",
     "phonenumber_field",
-    "saleor.cognito_auth_layer",
+    # Custom local apps
+    "cognito_auth",
+    "cms_integration",
 ]
 
 ENABLE_DJANGO_EXTENSIONS = get_bool_from_env("ENABLE_DJANGO_EXTENSIONS", False)
@@ -557,7 +559,10 @@ for entry_point in installed_plugins:
             INSTALLED_APPS.append(entry_point.name)
         EXTERNAL_PLUGINS.append(plugin_path)
 
-PLUGINS = BUILTIN_PLUGINS + EXTERNAL_PLUGINS
+# Custom local plugins
+LOCAL_PLUGINS = ["cms_integration.plugin.CMSIntegrationPlugin"]
+
+PLUGINS = BUILTIN_PLUGINS + EXTERNAL_PLUGINS + LOCAL_PLUGINS
 
 if (
     not DEBUG
@@ -662,8 +667,8 @@ COGNITO_JWT_AUTH = {
     "AUTH_HEADER_PREFIX": "Bearer",
 }
 
-COGNITO_AUTH_LAYER_APP_TOKEN = os.environ.get("COGNITO_AUTH_LAYER_APP_TOKEN")
-COGNITO_AUTH_LAYER_USER_PASSWORD = os.environ.get("COGNITO_AUTH_LAYER_USER_PASSWORD")
+COGNITO_AUTH_APP_TOKEN = os.environ.get("COGNITO_AUTH_APP_TOKEN")
+COGNITO_AUTH_USER_PASSWORD = os.environ.get("COGNITO_AUTH_USER_PASSWORD")
 
 # Saleor Integration
 # --------------------------------------
