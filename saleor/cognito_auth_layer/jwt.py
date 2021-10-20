@@ -43,6 +43,19 @@ def verify_and_decode(token):
         )
 
 
+def is_saleor_app_token(token):
+    try:
+        # try and decode token, if there's no issue decoding the token
+        # then it's a valid JWT token, which means it's a Cognito JWT
+        # note: this works because saleor app token is just a random string
+        #       and not in a valid jwt format
+        jwt.decode(token, options={"verify_signature": False})
+        return False
+    except:
+        # fail to decode token hence we can assume it's a saleor app token
+        return True
+
+
 def convert_cognito_jwt_to_saleor_jwt_from_request(request):
     jwt = None
 
@@ -56,10 +69,14 @@ def convert_cognito_jwt_to_saleor_jwt_from_request(request):
         prefix = settings.COGNITO_JWT_AUTH.get("AUTH_HEADER_PREFIX") + " "
 
         if auth_header.startswith(prefix) is not True:
-            raise Exception("Auth header is invalid")
+            return jwt
 
         # verify & decode token
         token = auth_header[len(prefix) :]
+
+        # early return if token is Saleor's App token but not Cognito JWT
+        if is_saleor_app_token(token):
+            return None
 
         # note: we get user's email info from 'username' attribute
         payload = verify_and_decode(token)
