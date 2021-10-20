@@ -8,7 +8,7 @@ from saleor.account.models import User
 saleor_url = settings.SALEOR_GRAPHQL_URL
 
 # saleor's app auth header
-auth_header = {"Authorization": f"Bearer {settings.COGNITO_AUTH_LAYER_APP_TOKEN}"}
+auth_header = {"Authorization": f"Bearer {settings.COGNITO_AUTH_APP_TOKEN}"}
 
 
 # standardize method to send graphql request

@@ -3,7 +3,7 @@ from .models import CognitoUserJwt
 from .api import get_user, create_new_user, create_saleor_access_token
 
 # note: all users will have the same password as given in the settings file
-user_password = settings.COGNITO_AUTH_LAYER_USER_PASSWORD
+user_password = settings.COGNITO_AUTH_USER_PASSWORD
 
 
 def get_saleor_jwt(email):

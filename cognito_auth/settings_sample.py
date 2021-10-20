@@ -1,5 +1,4 @@
 # Include this to the end of your saleor's setting file
-
 import os
 import json
 from urllib import request
@@ -16,7 +15,7 @@ from urllib import request
 
 # INSTALLED_APPS = [
 # ...
-# "saleor.cognito_auth_layer",
+# "cognito_auth.apps.CognitoAuthLayerConfig",
 # ...
 # ]
 
@@ -53,8 +52,8 @@ COGNITO_JWT_AUTH = {
     "AUTH_HEADER_PREFIX": "Bearer",
 }
 
-COGNITO_AUTH_LAYER_APP_TOKEN = os.environ.get("COGNITO_AUTH_LAYER_APP_TOKEN")
-COGNITO_AUTH_LAYER_USER_PASSWORD = os.environ.get("COGNITO_AUTH_LAYER_USER_PASSWORD")
+COGNITO_AUTH_APP_TOKEN = os.environ.get("COGNITO_AUTH_APP_TOKEN")
+COGNITO_AUTH_USER_PASSWORD = os.environ.get("COGNITO_AUTH_USER_PASSWORD")
 
 # Saleor Integration
 # --------------------------------------
