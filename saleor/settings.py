@@ -229,7 +229,7 @@ INSTALLED_APPS = [
     "phonenumber_field",
     # Custom local apps
     "cognito_auth",
-    "cms_integration",
+    "local_plugins",
 ]
 
 ENABLE_DJANGO_EXTENSIONS = get_bool_from_env("ENABLE_DJANGO_EXTENSIONS", False)
@@ -560,7 +560,10 @@ for entry_point in installed_plugins:
         EXTERNAL_PLUGINS.append(plugin_path)
 
 # Custom local plugins
-LOCAL_PLUGINS = ["cms_integration.plugin.CMSIntegrationPlugin"]
+LOCAL_PLUGINS = [
+    "local_plugins.cms.plugin.DjangoCMSPlugin",
+    "local_plugins.eghl.plugin.eGHLPaymentGatewayPlugin",
+]
 
 PLUGINS = BUILTIN_PLUGINS + EXTERNAL_PLUGINS + LOCAL_PLUGINS
 

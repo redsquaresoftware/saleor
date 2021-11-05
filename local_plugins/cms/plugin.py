@@ -1,15 +1,18 @@
+import pytz
 import datetime
 from saleor.plugins.base_plugin import BasePlugin
-from cms_integration.api import create_ads_package
+from .api import create_ads_package
 
 
-class CMSIntegrationPlugin(BasePlugin):
-    PLUGIN_ID = "cms_integration.plugin"
-    PLUGIN_NAME = "CMS Integration"
+class DjangoCMSPlugin(BasePlugin):
+    PLUGIN_ID = "local_plugins.cms.plugin"
+    PLUGIN_NAME = "Django CMS Integration"
     DEFAULT_ACTIVE = True
 
     def order_fully_paid(self, order, previous_value):
         try:
+            print("Order is fully paid: ", order)
+
             order_lines = order.lines.all()
 
             # go through each product in the order
@@ -91,7 +94,8 @@ def get_attributes_from_product(product):
 
 # this is a function meant for calculating start & end date for ads package only
 def calculate_start_and_end_date(ads_create_duration):
-    start_date = datetime.datetime.now()
+    # important: must follow utc time
+    start_date = datetime.datetime.now(pytz.utc)
     end_date = start_date
     duration = 0
 

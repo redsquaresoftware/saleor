@@ -48,5 +48,6 @@ def create_ads_package(
     error = safe_get(result, "data", "createAdsPackage", "error")
 
     if error is not None:
+        print("Error in creating Ads Package, full response: ", result)
         raise Exception("Ads Package cannot be created for user: ", email)
 
