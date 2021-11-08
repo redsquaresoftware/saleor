@@ -24,6 +24,10 @@ def send_graphql_request(query, variables):
 def create_ads_package(
     email, order_id, start_date, end_date, ads_number, is_unlimited_ads, sales_amount
 ):
+    print(
+        f"Sending Ads Package Create request to Django - Email: {email} | OrderID: {order_id}"
+    )
+
     query = """
         mutation params($email: String!, $orderId: ID!, $startDate: DateTime!, $endDate: DateTime!, $adsNumber: Int, $isUnlimitedAds: Boolean, $salesAmount: Float!) {
             createAdsPackage(input: { email: $email, orderId: $orderId, startDate: $startDate, endDate: $endDate, adsNumber: $adsNumber, isUnlimitedAds: $isUnlimitedAds, salesAmount: $salesAmount }) {
@@ -47,7 +51,7 @@ def create_ads_package(
     # try to parse and get user's email
     error = safe_get(result, "data", "createAdsPackage", "error")
 
-    if error is not None:
+    if error is not None and len(error) != 0:
         print("Error in creating Ads Package, full response: ", result)
         raise Exception("Ads Package cannot be created for user: ", email)
 
