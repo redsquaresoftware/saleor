@@ -39,9 +39,11 @@ class eGHLPaymentGatewayPlugin(BasePlugin):
                 order_id = safe_get(data, "order", "id")
                 update_payment_on_django(payment_id, order_id, is_success=True)
 
-            # transaction failed
+            # transaction failed or not found
             else:
-                update_payment_on_django(payment_id, order_id=None, is_success=False)
+                # only update if payment id can be found in the request
+                if payment_id:
+                    update_payment_on_django(payment_id, order_id=None, is_success=False)
 
             return HttpResponse(content="OK")
 
