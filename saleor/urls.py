@@ -5,7 +5,7 @@ from django.contrib.staticfiles.views import serve
 from django.views.decorators.csrf import csrf_exempt
 
 from .graphql.api import schema
-# from .graphql.views import GraphQLView
+from .graphql.views import GraphQLView
 from .plugins.views import (
     handle_global_plugin_webhook,
     handle_plugin_per_channel_webhook,
@@ -13,13 +13,13 @@ from .plugins.views import (
 )
 from .product.views import digital_product
 
-from cognito_auth.views import AuthenticatedGraphQLView
+# from cognito_auth.views import AuthenticatedGraphQLView
 
 
 urlpatterns = [
     url(
         r"^graphql/$",
-        csrf_exempt(AuthenticatedGraphQLView.as_view(schema=schema)),
+        csrf_exempt(GraphQLView.as_view(schema=schema)),
         name="api",
     ),
     url(
