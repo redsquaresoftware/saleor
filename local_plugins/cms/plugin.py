@@ -1,7 +1,17 @@
-import pytz
-import datetime
+# from graphql_relay import to_global_id
+from graphql_relay.node.node import from_global_id
 from saleor.plugins.base_plugin import BasePlugin
-from .api import create_ads_package
+from saleor.order.models import Order
+from .api import create_ads_package, create_add_on
+
+# import all constants
+from .constants import *
+from .helpers import (
+    get_attributes_from_product,
+    get_attributes_from_add_on,
+    calculate_start_and_end_date,
+    preprocess_ads_number,
+)
 
 
 class DjangoCMSPlugin(BasePlugin):
@@ -9,103 +19,90 @@ class DjangoCMSPlugin(BasePlugin):
     PLUGIN_NAME = "Django CMS Integration"
     DEFAULT_ACTIVE = True
 
+    def checkout_updated(self, checkout, previous_value):
+        pass
+
+    # initial idea: use this order fully paid hook to process and add ads packages/add-ons to
+    #               listing on django, however this approach comes with serious downsides
+    # 1. we don't have access to transaction data, e.g. payment_id
+    # 2. we can't ensure that update_payment_on_django will be completed before this hook is triggered
+    # 3. (Side Effect) if an admin creates an order manually on dashboard, it'd break the overall payment flow
+    # As a result, we need other get-around hacks to overcome this issue.
+    #
+    # Solution: don't use this fully-paid hook, just use a function call in eGHL plugin. this way, we can
+    #           have access to the payment_id + we can always ensure the function will only be called
+    #           when update_payment_on_django is completed
     def order_fully_paid(self, order, previous_value):
-        try:
-            print("Order is fully paid: ", order)
-
-            order_lines = order.lines.all()
-
-            # go through each product in the order
-            for line in order_lines:
-
-                # retrieve the actual product object from db
-                product = line.variant.product
-                type = product.product_type
-
-                # for Ads Package product, we want to create a record in Django
-                # to tie advertiser to the order
-                if type.name == "Ads Package":
-
-                    ads_number, ads_create_duration = get_attributes_from_product(
-                        product
-                    )
-
-                    start_date, end_date = calculate_start_and_end_date(
-                        ads_create_duration
-                    )
-
-                    # preprocessing before sending the graphql
-                    # ------------------
-
-                    # check if ads number is unlimited
-                    if ads_number == "Unlimited":
-                        ads_number = None
-                        is_unlimited_ads = True
-                    else:
-                        ads_number = int(ads_number)
-                        is_unlimited_ads = False
-
-                    create_ads_package(
-                        email=order.user_email,
-                        order_id=order.id,
-                        start_date=start_date,
-                        end_date=end_date,
-                        ads_number=ads_number,
-                        is_unlimited_ads=is_unlimited_ads,
-                        sales_amount=float(order.total_gross_amount),
-                    )
-
-        except Exception as e:
-            print("Error in CMS Integration plugin order_fully_paid: ", e)
-            pass
-
-        # send mutation here to Django
+        # # convert order object id to relay global id
+        # order_id = to_global_id(type(order).__name__, order.id)
+        # process_order(order_id)
+        pass
 
 
-# helper functions
-# ---------------------
+# main function to use to process order and add ads package/add-on to django
+# parameter: order_id must be in relay global id format
+def process_order(order_id):
+    try:
+        # convert relay global id to object id
+        _, id = from_global_id(order_id)
 
-# this is a function meant for getting 'ads_number' & 'ads_create_duration'
-# attribute values from a product only
-def get_attributes_from_product(product):
-    ads_number = None
-    ads_create_duration = None
+        # make sure order exists
+        order = Order.objects.get(id=id)
 
-    # get values for number of ads & ads-create duration from the
-    # product attributes
-    for attr in product.attributes.all():
+        print("Order is fully paid: ", order)
 
-        # get attribute name
-        name = attr.assignment.attribute.name
+        order_lines = order.lines.all()
 
-        # note we allow 1 value for an attribute, hence we always
-        # get the first one
-        value = attr.values.all()[0].name
+        # for temporarily storing all add-ons
+        add_ons = []
 
-        if name == "Number of Ads":
-            ads_number = value
+        # go through each product in the order
+        for line in order_lines:
 
-        if name == "Ads-create Duration":
-            ads_create_duration = value
+            # retrieve the actual product object from db
+            product = line.variant.product
+            product_type = product.product_type.name.upper()
 
-    # return all values retrieved
-    return ads_number, ads_create_duration
+            # for Ads Package product, we want to create a record in Django
+            # to tie advertiser to the order
+            if product_type == PRODUCT_TYPE_ADS_PACKAGE:
 
+                # preprocessing
+                ads_number, ads_create_duration = get_attributes_from_product(product)
 
-# this is a function meant for calculating start & end date for ads package only
-def calculate_start_and_end_date(ads_create_duration):
-    # important: must follow utc time
-    start_date = datetime.datetime.now(pytz.utc)
-    end_date = start_date
-    duration = 0
+                start_date, end_date = calculate_start_and_end_date(ads_create_duration)
 
-    # convert ads_create_duration in string format to days unit
-    if ads_create_duration == "1-Week":
-        duration = 7
-    elif ads_create_duration == "1-Month":
-        duration = 30
+                ads_number, is_unlimited_ads = preprocess_ads_number(ads_number)
 
-    # calculate end date
-    end_date += datetime.timedelta(days=duration)
+                # send graphql request to django
+                create_ads_package(
+                    email=order.user_email,
+                    order_id=order_id,
+                    start_date=start_date,
+                    end_date=end_date,
+                    ads_number=ads_number,
+                    is_unlimited_ads=is_unlimited_ads,
+                    sales_amount=float(order.total_gross_amount),
+                    quantity=line.quantity,
+                )
 
-    return start_date.isoformat(), end_date.isoformat()
+            elif product_type == PRODUCT_TYPE_ADD_ON:
+                add_ons.append(
+                    {
+                        "quantity": line.quantity,
+                        **get_attributes_from_add_on(product, line),
+                    }
+                )
+
+        # send request to django to save add-ons
+        if add_ons and len(add_ons) > 0:
+            create_add_on(order_id, add_ons)
+
+    except Order.DoesNotExist:
+        print("Order is not found in CMS Integration - ", order_id)
+        pass
+
+    except Exception as e:
+        print("Error in CMS Integration plugin order_fully_paid: ", e)
+        pass
+

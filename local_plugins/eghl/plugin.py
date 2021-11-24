@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from saleor.plugins.base_plugin import BasePlugin
 from cognito_auth.utils import safe_get
 from .api import checkout_payment_create, checkout_complete, update_payment_on_django
-
+from local_plugins.cms.plugin import process_order
 
 EGHL_TRANSACTION_SUCCESS_CODE = "0"
 EGHL_TRANSACTION_FAILURE_CODE = "1"
@@ -37,19 +37,29 @@ class eGHLPaymentGatewayPlugin(BasePlugin):
 
                 # lastly, we can update payment status on Django so that we can keep track
                 order_id = safe_get(data, "order", "id")
-                update_payment_on_django(payment_id, order_id, is_success=True)
+                success = update_payment_on_django(
+                    payment_id, order_id, is_success=True
+                )
+
+                # only process order to add ads packages/addons to django if everything goes well
+                if success:
+                    process_order(order_id)
 
             # transaction failed or not found
             else:
                 # only update if payment id can be found in the request
                 if payment_id:
-                    update_payment_on_django(payment_id, order_id=None, is_success=False)
+                    update_payment_on_django(
+                        payment_id, order_id=None, is_success=False
+                    )
 
             return HttpResponse(content="OK")
 
-        # anything failed, log it then update payemtn status as failed
+        # anything failed, log it then update payment status as failed
         except Exception as e:
             print("EXCEPTION IN eGHL Webhook: ", e)
-            update_payment_on_django(payment_id, order_id=None, is_success=False)
+
+            if payment_id:
+                update_payment_on_django(payment_id, order_id=None, is_success=False)
 
             return HttpResponse(content="OK")

@@ -130,4 +130,5 @@ def update_payment_on_django(payment_id, order_id, is_success):
     if error is not None:
         raise Exception(f"Payment cannot be updated - {payment_id}: ", error)
 
-    return result
+    # true indicate update success
+    return True

@@ -55,3 +55,42 @@ def create_ads_package(
         print("Error in creating Ads Package, full response: ", result)
         raise Exception("Ads Package cannot be created for user: ", email)
 
+
+def create_add_on(order_id, add_ons):
+    print(f"Sending Add On Create request to Django - OrderID: {order_id}")
+
+    query = """
+        mutation params($orderId: ID!, $addOnInput: [AddOnInput]) {
+            createAddOn(input: { orderId: $orderId, addOnInput: $addOnInput }) {
+                ok
+                error
+            }
+        }
+    """
+
+    variables = {
+        "orderId": order_id,
+        "addOnInput": [
+            {
+                "addOnType": safe_get(x, "add_on_type"),
+                "isMywheels": safe_get(x, "is_mywheels"),
+                "isCpRegional": safe_get(x, "is_cp_regional"),
+                "region": safe_get(x, "region"),
+                "addOnDuration": safe_get(x, "add_on_duration"),
+                "quantity": safe_get(x, "quantity"),
+            }
+            for x in add_ons
+        ],
+    }
+
+    result = send_graphql_request(query, variables)
+
+    print("RESULT for add-on create: ", result)
+
+    # try to parse and get user's email
+    error = safe_get(result, "data", "createAddOn", "error")
+
+    if error is not None and len(error) != 0:
+        print("Error in creating Add On, full response: ", result)
+        raise Exception("Add On cannot be created for order: ", order_id)
+
