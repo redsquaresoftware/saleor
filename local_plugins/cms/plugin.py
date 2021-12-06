@@ -38,6 +38,9 @@ class DjangoCMSPlugin(BasePlugin):
         # process_order(order_id)
         pass
 
+    def order_created(self, order, previous_value):
+        pass
+
 
 # main function to use to process order and add ads package/add-on to django
 # parameter: order_id must be in relay global id format
@@ -76,13 +79,13 @@ def process_order(order_id):
 
                 # send graphql request to django
                 create_ads_package(
+                    name=product.name,
                     email=order.user_email,
                     order_id=order_id,
                     start_date=start_date,
                     end_date=end_date,
                     ads_number=ads_number,
                     is_unlimited_ads=is_unlimited_ads,
-                    sales_amount=float(order.total_gross_amount),
                     quantity=line.quantity,
                 )
 

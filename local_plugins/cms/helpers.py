@@ -88,39 +88,36 @@ def get_attributes_from_add_on(product, line):
 
     # default attribute values
     add_on_type = None
-    is_mywheels = False
-    is_cp_regional = False
     region = None
     add_on_duration = product_attr_value.upper()
 
+    # set add_on_type & region based on add on attributes
     if product_name == ADD_ON_PREMIUM:
         add_on_type = DJANGO_ENUM_ADD_ON_PREMIUM
+        region = ADD_ON_REGION_MYWHEELS
 
     elif product_name == ADD_ON_MYWHEELS_FEATURE:
         add_on_type = DJANGO_ENUM_ADD_ON_FEATURED
-        is_mywheels = True
+        region = ADD_ON_REGION_MYWHEELS
 
     elif product_name == ADD_ON_MYWHEELS_FB_POST:
         add_on_type = DJANGO_ENUM_ADD_ON_FB_POST
-        is_mywheels = True
+        region = ADD_ON_REGION_MYWHEELS
 
     elif product_name == ADD_ON_MYWHEELS_FB_PIN:
         add_on_type = DJANGO_ENUM_ADD_ON_FB_PIN
-        is_mywheels = True
+        region = ADD_ON_REGION_MYWHEELS
 
     elif product_name == ADD_ON_CP_REGIONAL_FEATURE:
         add_on_type = DJANGO_ENUM_ADD_ON_FEATURED
-        is_cp_regional = True
         region = variant_attr_value
 
     elif product_name == ADD_ON_CP_REGIONAL_FB:
         add_on_type = DJANGO_ENUM_ADD_ON_FB_POST
-        is_cp_regional = True
         region = variant_attr_value
 
     elif product_name == ADD_ON_CP_REGIONAL_FB_PIN:
         add_on_type = DJANGO_ENUM_ADD_ON_FB_PIN
-        is_cp_regional = True
         region = variant_attr_value
 
     # convert add-on duration to django enum
@@ -132,8 +129,6 @@ def get_attributes_from_add_on(product, line):
 
     return {
         "add_on_type": add_on_type,
-        "is_mywheels": is_mywheels,
-        "is_cp_regional": is_cp_regional,
-        "region": region,
         "add_on_duration": add_on_duration,
+        "region": region,
     }

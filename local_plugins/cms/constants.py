@@ -42,6 +42,7 @@ ADD_ON_REGION_KUL = "KUL"
 ADD_ON_REGION_MLK = "MLK"
 ADD_ON_REGION_NSN = "NSN"
 ADD_ON_REGION_PRK = "PRK"
+ADD_ON_REGION_MYWHEELS = "MYWHEELS"
 
 
 # constant values for django API integration purposes

@@ -22,31 +22,41 @@ def send_graphql_request(query, variables):
 
 
 def create_ads_package(
-    email, order_id, start_date, end_date, ads_number, is_unlimited_ads, sales_amount
+    name,
+    email,
+    order_id,
+    start_date,
+    end_date,
+    ads_number,
+    is_unlimited_ads,
+    quantity,
 ):
     print(
         f"Sending Ads Package Create request to Django - Email: {email} | OrderID: {order_id}"
     )
 
     query = """
-        mutation params($email: String!, $orderId: ID!, $startDate: DateTime!, $endDate: DateTime!, $adsNumber: Int, $isUnlimitedAds: Boolean, $salesAmount: Float!) {
-            createAdsPackage(input: { email: $email, orderId: $orderId, startDate: $startDate, endDate: $endDate, adsNumber: $adsNumber, isUnlimitedAds: $isUnlimitedAds, salesAmount: $salesAmount }) {
+        mutation params($name: String!, $email: String!, $orderId: ID!, $startDate: DateTime!, $endDate: DateTime!, $adsNumber: Int, $isUnlimitedAds: Boolean, $quantity: Int!) {
+            createAdsPackage(input: { name: $name, email: $email, orderId: $orderId, startDate: $startDate, endDate: $endDate, adsNumber: $adsNumber, isUnlimitedAds: $isUnlimitedAds, quantity: $quantity }) {
                 ok
                 error
             }
         }
     """
     variables = {
+        "name": name,
         "email": email,
         "orderId": order_id,
         "startDate": start_date,
         "endDate": end_date,
         "adsNumber": ads_number,
         "isUnlimitedAds": is_unlimited_ads,
-        "salesAmount": sales_amount,
+        "quantity": quantity,
     }
 
     result = send_graphql_request(query, variables)
+
+    print("RESULT for ads package create: ", result)
 
     # try to parse and get user's email
     error = safe_get(result, "data", "createAdsPackage", "error")
@@ -73,8 +83,6 @@ def create_add_on(order_id, add_ons):
         "addOnInput": [
             {
                 "addOnType": safe_get(x, "add_on_type"),
-                "isMywheels": safe_get(x, "is_mywheels"),
-                "isCpRegional": safe_get(x, "is_cp_regional"),
                 "region": safe_get(x, "region"),
                 "addOnDuration": safe_get(x, "add_on_duration"),
                 "quantity": safe_get(x, "quantity"),
