@@ -1,4 +1,4 @@
-# from graphql_relay import to_global_id
+from datetime import datetime
 from graphql_relay.node.node import from_global_id
 from saleor.plugins.base_plugin import BasePlugin
 from saleor.order.models import Order
@@ -38,7 +38,18 @@ class DjangoCMSPlugin(BasePlugin):
         # process_order(order_id)
         pass
 
+    # format order/invoice number
     def order_created(self, order, previous_value):
+        # invoice format: <MY> + <calendar year> + <7 digit running number> e.g.MY20210000001
+        prefix = "MY"
+        year = f"{datetime.now().year}"
+        running_number = f"{order.id:07}"
+
+        # use 'customer_note' field as the medium to store formatted order id
+        order.customer_note = prefix + year + running_number
+        order.save()
+
+    def invoice_request(self, order, invoice, number, previous_value):
         pass
 
 
