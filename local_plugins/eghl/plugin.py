@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from saleor.plugins.base_plugin import BasePlugin
 from cognito_auth.utils import safe_get
 from .api import checkout_payment_create, checkout_complete, update_payment_on_django
+from local_plugins.receipting.api import invoice_request
 from local_plugins.cms.plugin import process_order
 
 EGHL_TRANSACTION_SUCCESS_CODE = "0"
@@ -22,10 +23,11 @@ class eGHLPaymentGatewayPlugin(BasePlugin):
         amount = body.get("Amount")
         payment_id = body.get("PaymentID")
         credit_card = body.get("CardNoMask")
+        status = str(body.get("TxnStatus"))
 
         try:
             # make sure eghl transaction is successful
-            if str(body.get("TxnStatus")) == EGHL_TRANSACTION_SUCCESS_CODE:
+            if status == EGHL_TRANSACTION_SUCCESS_CODE:
 
                 # use dummy payment gateway to mock payment for checkout on saleor
                 # raises exception if any error found from response
@@ -41,25 +43,25 @@ class eGHLPaymentGatewayPlugin(BasePlugin):
                     payment_id, order_id, is_success=True
                 )
 
-                # only process order to add ads packages/addons to django if everything goes well
-                if success:
-                    process_order(order_id)
-
             # transaction failed or not found
             else:
-                # only update if payment id can be found in the request
-                if payment_id:
-                    update_payment_on_django(
-                        payment_id, order_id=None, is_success=False
-                    )
-
-            return HttpResponse(content="OK")
+                raise Exception(
+                    f"Transaction is not successful for {payment_id} - status: {status}"
+                )
 
         # anything failed, log it then update payment status as failed
         except Exception as e:
             print("EXCEPTION IN eGHL Webhook: ", e)
 
+            # only update if payment id can be found in the request
             if payment_id:
                 update_payment_on_django(payment_id, order_id=None, is_success=False)
 
-            return HttpResponse(content="OK")
+        # only process order to add ads packages/addons to django if everything goes well
+        if success:
+            process_order(order_id=order_id)
+
+            # generate both invoice & receipt straight away
+            invoice_request(order_id=order_id)
+
+        return HttpResponse(content="OK")

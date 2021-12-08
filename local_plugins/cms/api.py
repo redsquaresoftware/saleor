@@ -22,14 +22,7 @@ def send_graphql_request(query, variables):
 
 
 def create_ads_package(
-    name,
-    email,
-    order_id,
-    start_date,
-    end_date,
-    ads_number,
-    is_unlimited_ads,
-    quantity,
+    name, email, order_id, start_date, end_date, ads_number, is_unlimited_ads, quantity,
 ):
     print(
         f"Sending Ads Package Create request to Django - Email: {email} | OrderID: {order_id}"
@@ -55,8 +48,6 @@ def create_ads_package(
     }
 
     result = send_graphql_request(query, variables)
-
-    print("RESULT for ads package create: ", result)
 
     # try to parse and get user's email
     error = safe_get(result, "data", "createAdsPackage", "error")
@@ -92,8 +83,6 @@ def create_add_on(order_id, add_ons):
     }
 
     result = send_graphql_request(query, variables)
-
-    print("RESULT for add-on create: ", result)
 
     # try to parse and get user's email
     error = safe_get(result, "data", "createAddOn", "error")
