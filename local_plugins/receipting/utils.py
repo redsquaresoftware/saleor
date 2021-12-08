@@ -79,8 +79,9 @@ def generate_receipt_pdf(invoice):
         all_products[product_limit_first_page:], MAX_PRODUCTS_PER_PAGE
     )
 
-    # get discount objects
-    all_discounts = invoice.order.discounts.all()
+    # calculate total discount
+    order = invoice.order
+    total_discount = order.undiscounted_total_gross_amount - order.total_gross_amount
 
     creation_date = datetime.now(tz=pytz.utc)
 
@@ -89,8 +90,8 @@ def generate_receipt_pdf(invoice):
         {
             "invoice": invoice,
             "creation_date": creation_date.strftime("%d %b %Y"),
-            "order": invoice.order,
-            "discounts": all_discounts,
+            "order": order,
+            "total_discount": total_discount,
             "font_path": f"file://{font_path}",
             "products_first_page": products_first_page,
             "rest_of_products": rest_of_products,
