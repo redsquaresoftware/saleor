@@ -563,6 +563,7 @@ for entry_point in installed_plugins:
 LOCAL_PLUGINS = [
     "local_plugins.cms.plugin.DjangoCMSPlugin",
     "local_plugins.eghl.plugin.eGHLPaymentGatewayPlugin",
+    "local_plugins.receipting.plugin.ReceiptingPlugin",
 ]
 
 PLUGINS = BUILTIN_PLUGINS + EXTERNAL_PLUGINS + LOCAL_PLUGINS

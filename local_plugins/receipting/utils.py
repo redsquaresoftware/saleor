@@ -1,46 +1,41 @@
 import os
-import re
+import pytz
 from datetime import datetime
 
-import pytz
+from weasyprint import HTML
 from django.conf import settings
 from django.template.loader import get_template
-from weasyprint import HTML
-
-from ...invoice.models import Invoice
-
-MAX_PRODUCTS_WITH_TABLE = 3
-MAX_PRODUCTS_WITHOUT_TABLE = 4
-MAX_PRODUCTS_PER_PAGE = 13
+from saleor.plugins.invoicing.utils import (
+    MAX_PRODUCTS_WITH_TABLE,
+    MAX_PRODUCTS_WITHOUT_TABLE,
+    MAX_PRODUCTS_PER_PAGE,
+)
 
 
-def make_full_invoice_number(number=None, month=None, year=None):
-    now = datetime.now()
-    current_month = int(now.strftime("%m"))
-    current_year = int(now.strftime("%Y"))
-    month_and_year = now.strftime("%m/%Y")
+def generate_invoice_number(order):
+    # invoice format: <MY> + <calendar year> + <7 digit running number>
+    # e.g.MY20210000001
 
-    if month == current_month and year == current_year:
-        new_number = (number or 0) + 1
-        return f"{new_number}/{month_and_year}"
-    return f"1/{month_and_year}"
+    prefix = "MY"
+    year = f"{order.created.year}"
+    running_number = f"{order.id:07}"
 
-
-def parse_invoice_dates(invoice):
-    match = re.match(r"^(\d+)\/(\d+)\/(\d+)", invoice.number)
-    return int(match.group(1)), int(match.group(2)), int(match.group(3))
+    return prefix + year + running_number
 
 
-def generate_invoice_number():
-    last_invoice = Invoice.objects.filter(number__isnull=False).last()
-    if not last_invoice or not last_invoice.number:
-        return make_full_invoice_number()
+def generate_receipt_number(order):
+    # receipt format: <RMY> + <calendar year> + <7 digit running number>
+    # e.g.RMY20210000001
 
-    try:
-        number, month, year = parse_invoice_dates(last_invoice)
-        return make_full_invoice_number(number, month, year)
-    except (IndexError, ValueError, AttributeError):
-        return make_full_invoice_number()
+    prefix = "RMY"
+    year = f"{order.created.year}"
+    running_number = f"{order.id:07}"
+
+    return prefix + year + running_number
+
+
+# receipt generation
+# ----------------------
 
 
 def chunk_products(products, product_limit):
@@ -62,25 +57,35 @@ def get_product_limit_first_page(products):
     return MAX_PRODUCTS_WITHOUT_TABLE
 
 
-def generate_invoice_pdf(invoice):
+# Saleor doesn't have receipt feature, hence use this function to generate a receipt
+# pdf instead from an invoice object
+# note: this is copied from the generate_invoice_pdf in saleor.saleor.plugins.invoicing.utils
+def generate_receipt_pdf(invoice):
+
+    # make sure this points to the correct html file
+    receipt_html_path = "invoices/invoice.html"
+
+    # these parts are exactly the same as the original function
     font_path = os.path.join(
         settings.PROJECT_ROOT, "templates", "invoices", "inter.ttf"
     )
 
+    # get all products listed in the invoice, then break them into pages to be displayed
+    # in the pdf
     all_products = invoice.order.lines.all()
-
     product_limit_first_page = get_product_limit_first_page(all_products)
-
     products_first_page = all_products[:product_limit_first_page]
     rest_of_products = chunk_products(
         all_products[product_limit_first_page:], MAX_PRODUCTS_PER_PAGE
     )
-    creation_date = datetime.now(tz=pytz.utc)
 
     # get discount objects
     all_discounts = invoice.order.discounts.all()
 
-    rendered_template = get_template("invoices/invoice.html").render(
+    creation_date = datetime.now(tz=pytz.utc)
+
+    # render html template with all the variables
+    rendered_template = get_template(receipt_html_path).render(
         {
             "invoice": invoice,
             "creation_date": creation_date.strftime("%d %b %Y"),

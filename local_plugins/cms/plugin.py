@@ -49,9 +49,6 @@ class DjangoCMSPlugin(BasePlugin):
         order.customer_note = prefix + year + running_number
         order.save()
 
-    def invoice_request(self, order, invoice, number, previous_value):
-        pass
-
 
 # main function to use to process order and add ads package/add-on to django
 # parameter: order_id must be in relay global id format
