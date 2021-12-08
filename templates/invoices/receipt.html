@@ -276,11 +276,10 @@
             (Agency)</span></h3>
         <h3>Fax:&nbsp;&nbsp;<span>03-2283 3519 (Account Dept)</span></h3>
       </div>
-      <div class="col-6" style="align-items: flex-end;">
+      <div class="col-6">
         <h3>Invoice #:&nbsp;&nbsp;<span>{{ invoice.number }}</span></h3>
         <h3>Invoice Date:&nbsp;&nbsp;<span>{{ creation_date }}</span></h3>
         <h3>Order #:&nbsp;&nbsp;<span>{{ order.id }}</span></h3>
-        <h3>Agent:&nbsp;&nbsp;<span>Agent Name</span></h3>
       </div>
     </div>
     <div class="customer-info">
@@ -453,13 +452,13 @@
   </div>
   <!-- <h2 class="footer">This is a computer generated invoice. No signature is required.</h2> -->
   <div class="footer">
-    <!-- {% if order.get_last_payment %}
+    {% if order.get_last_payment %}
     <h2>Payment Method:&nbsp;&nbsp;<span>{{ order.get_last_payment.gateway }}</span></h2>
     {% else %}
     <span class="normal-text">Unpaid</span>
     {% endif %}
 
-    <h2>Payment Reference Number:&nbsp;&nbsp;<span></span></h2> -->
+    <h2>Payment Reference Number:&nbsp;&nbsp;<span></span></h2>
     <h2>This is a computer generated invoice. No signature is required.</h2>
   </div>
 </body>

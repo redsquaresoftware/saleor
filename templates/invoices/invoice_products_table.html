@@ -1,39 +1,41 @@
+<link rel="stylesheet" type="text/css" href="./stylesheet.css" media="screen" />
+<link href="https://fonts.googleapis.com/css?family=Poppins:400,500,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+  integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+  integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
+</script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+  integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+</script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+  integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
+</script>
 {% load price from taxed_prices %}
-<table class="products-table">
-    <tbody>
-        <tr class="row-category">
-            <td class="cell-product">
-                <span class="header-category-small">Products</span>
-            </td>
-            <td class="cell-price">
-                <span class="header-category-small cell-price-content">Price</span>
-            </td>
-            <td class="cell-quantity">
-                <span class="header-category-small cell-quantity-content">Quantity</span>
-            </td>
-            <td class="cell-total-price">
-                <span class="header-category-small">Total Price</span>
-            </td>
-        </tr>
-        {% for product in products %}
-        <tr class="row-product">
-            <td class="cell-product">
-                <span class="normal-text-table">
-                    {{ product|truncatechars:46 }}
-                    <div class="padded-font-small"></div>
-                    <span class="header-category-small">SKU: {{ product.product_sku }}</span>
-                </span>
-            </td>
-            <td class="cell-price">
-                <span class="normal-text-table cell-price-content">{% price product.unit_price.gross %}</span>
-            </td>
-            <td class="cell-quantity">
-                <span class="normal-text-table cell-quantity-content">{{ product.quantity }}</span>
-            </td>
-            <td class="cell-total-price">
-                <span class="normal-text-table">{% price product.total_price.gross %}</span>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Description</th>
+      <th scope="col" style="text-align: right;">Quantity</th>
+      <th scope="col" style="text-align: right;">Price (MYR)</th>
+    </tr>
+  </thead>
+  <tbody>
+
+    {% for product in products %}
+    <tr class="row-product">
+      <td class="cell-product">
+        <span class="normal-text-table">
+          {{ product|truncatechars:46 }}
+        </span>
+      </td>
+      <td class="cell-quantity">
+        <span class="normal-text-table cell-quantity-content">{{ product.quantity }}</span>
+      </td>
+      <td class="cell-total-price">
+        <span class="normal-text-table">{% price product.total_price.gross %}</span>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
 </table>
