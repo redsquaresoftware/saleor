@@ -81,10 +81,18 @@ def generate_invoice_pdf(invoice):
     order = invoice.order
     total_discount = order.undiscounted_total_gross_amount - order.total_gross_amount
 
+    # get additional data required
+    agent_name = order.metadata.get("agent_name")
+    payment_ref = order.metadata.get("payment_id")
+    payment_method = order.metadata.get("payment_method")
+
     rendered_template = get_template("invoices/invoice.html").render(
         {
             "invoice": invoice,
             "creation_date": creation_date.strftime("%d %b %Y"),
+            "agent_name": agent_name,
+            "payment_ref": payment_ref,
+            "payment_method": payment_method,
             "order": order,
             "total_discount": total_discount,
             "font_path": f"file://{font_path}",

@@ -19,7 +19,7 @@ def send_graphql_request(query, variables):
 # -------------------------------
 
 
-def invoice_request(order_id):
+def invoice_request_for_order(order_id):
     query = """
         mutation params($orderId: ID!) {
             invoiceRequest(orderId: $orderId) {

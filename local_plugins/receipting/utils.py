@@ -63,7 +63,7 @@ def get_product_limit_first_page(products):
 def generate_receipt_pdf(invoice):
 
     # make sure this points to the correct html file
-    receipt_html_path = "invoices/invoice.html"
+    receipt_html_path = "invoices/receipt.html"
 
     # these parts are exactly the same as the original function
     font_path = os.path.join(
@@ -83,6 +83,11 @@ def generate_receipt_pdf(invoice):
     order = invoice.order
     total_discount = order.undiscounted_total_gross_amount - order.total_gross_amount
 
+    # get additional data required
+    agent_name = order.metadata.get("agent_name")
+    payment_ref = order.metadata.get("payment_id")
+    payment_method = order.metadata.get("payment_method")
+
     creation_date = datetime.now(tz=pytz.utc)
 
     # render html template with all the variables
@@ -90,6 +95,9 @@ def generate_receipt_pdf(invoice):
         {
             "invoice": invoice,
             "creation_date": creation_date.strftime("%d %b %Y"),
+            "agent_name": agent_name,
+            "payment_ref": payment_ref,
+            "payment_method": payment_method,
             "order": order,
             "total_discount": total_discount,
             "font_path": f"file://{font_path}",
