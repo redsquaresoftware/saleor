@@ -102,14 +102,14 @@ def checkout_complete(token):
     return result
 
 
-def update_payment_on_django(payment_id, order_id, is_success):
+def complete_payment_on_django(payment_id, order_id, is_success):
     print(
         f"Sending Payment Update request to Django - PaymentID: {payment_id} | OrderID: {order_id} | Success: {is_success}"
     )
 
     query = f"""
         mutation params($paymentId: ID!, {"$orderId: ID," if order_id else ""} $isSuccess: Boolean!) {{
-            updatePayment(input: {{paymentId: $paymentId, {"orderId: $orderId," if order_id else ""} isSuccess: $isSuccess}}) {{
+            completePayment(input: {{paymentId: $paymentId, {"orderId: $orderId," if order_id else ""} isSuccess: $isSuccess}}) {{
                 ok
                 error
             }}
@@ -127,8 +127,10 @@ def update_payment_on_django(payment_id, order_id, is_success):
     result = send_django_graphql_request(query, variables)
     error = safe_get(result, "data", "error")
 
+    print("FULL GRAPHQL RESULT: ", result)
+
     if error is not None:
-        raise Exception(f"Payment cannot be updated - {payment_id}: ", error)
+        raise Exception(f"Payment cannot be completed - {payment_id}: ", error)
 
     # true indicate update success
     return True

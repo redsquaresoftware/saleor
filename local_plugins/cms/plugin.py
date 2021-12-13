@@ -27,13 +27,13 @@ class DjangoCMSPlugin(BasePlugin):
     # initial idea: use this order fully paid hook to process and add ads packages/add-ons to
     #               listing on django, however this approach comes with serious downsides
     # 1. we don't have access to transaction data, e.g. payment_id
-    # 2. we can't ensure that update_payment_on_django will be completed before this hook is triggered
+    # 2. we can't ensure that complete_payment_on_django will be completed before this hook is triggered
     # 3. (Side Effect) if an admin creates an order manually on dashboard, it'd break the overall payment flow
     # As a result, we need other get-around hacks to overcome this issue.
     #
     # Solution: don't use this fully-paid hook, just use a function call in eGHL plugin. this way, we can
     #           have access to the payment_id + we can always ensure the function will only be called
-    #           when update_payment_on_django is completed
+    #           when complete_payment_on_django is completed
     # def order_fully_paid(self, order, previous_value):
     #     # convert order object id to relay global id
     #     order_id = to_global_id(type(order).__name__, order.id)

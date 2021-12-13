@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from saleor.celeryconf import app
 from saleor.plugins.base_plugin import BasePlugin
 from cognito_auth.utils import safe_get
-from .api import checkout_payment_create, checkout_complete, update_payment_on_django
+from .api import checkout_payment_create, checkout_complete, complete_payment_on_django
 from local_plugins.cms.plugin import process_order_on_django, save_order_metadata
 from local_plugins.receipting.api import invoice_request_for_order
 
@@ -31,12 +31,17 @@ def process_transaction(request_body):
     # extract values from body
     body = request_body
     token = body.get("Param6")
-    agent = body.get("Param7")
-    amount = body.get("Amount")
+    custom = body.get("Param7")
+    total_amount = body.get("Amount")
     payment_id = body.get("PaymentID")
     payment_method = body.get("PymtMethod")
     credit_card = body.get("CardNoMask")
     status = str(body.get("TxnStatus"))
+
+    # take off tax from payment amount so that it tallys with
+    # the total amount in the checkout
+    tax_amount, agent_name = custom.split("|", maxsplit=1)
+    taxed_amount = round(float(total_amount) - float(tax_amount), 2)
 
     # for checking if transaction processing is successful or not
     success = False
@@ -47,7 +52,7 @@ def process_transaction(request_body):
 
             # use dummy payment gateway to mock payment for checkout on saleor
             # raises exception if any error found from response
-            checkout_payment_create(token, amount, credit_card)
+            checkout_payment_create(token, taxed_amount, credit_card)
 
             # closes checkout and create an order
             # raises exception if any error found from response
@@ -55,7 +60,7 @@ def process_transaction(request_body):
 
             # lastly, we can update payment status on Django so that we can keep track
             order_id = safe_get(data, "order", "id")
-            success = update_payment_on_django(payment_id, order_id, is_success=True)
+            success = complete_payment_on_django(payment_id, order_id, is_success=True)
 
         # transaction failed or not found
         else:
@@ -69,7 +74,7 @@ def process_transaction(request_body):
 
         # only update if payment id can be found in the request
         if payment_id:
-            update_payment_on_django(payment_id, order_id=None, is_success=False)
+            complete_payment_on_django(payment_id, order_id=None, is_success=False)
 
     # only process order to add ads packages/addons to django if everything goes well
     if success:
@@ -78,7 +83,9 @@ def process_transaction(request_body):
         # save payment id & agent name as it's needed to generate invoice/receipt
         save_order_metadata(
             order_id=order_id,
-            agent_name=agent,
+            tax_amount=tax_amount,
+            totat_amount=total_amount,
+            agent_name=agent_name,
             payment_id=payment_id,
             payment_method=payment_method,
         )
