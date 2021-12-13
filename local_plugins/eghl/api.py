@@ -127,8 +127,6 @@ def complete_payment_on_django(payment_id, order_id, is_success):
     result = send_django_graphql_request(query, variables)
     error = safe_get(result, "data", "error")
 
-    print("FULL GRAPHQL RESULT: ", result)
-
     if error is not None:
         raise Exception(f"Payment cannot be completed - {payment_id}: ", error)
 
