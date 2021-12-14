@@ -9,7 +9,7 @@
       <td class="cell-quantity"></td>
       <td class="cell-total-price">
         <span class="header-item">
-          {% price order.get_subtotal.gross %}
+          {{ subtotal_amount }}
         </span>
       </td>
     </tr>
@@ -20,7 +20,7 @@
       <td class="cell-quantity"></td>
       <td class="cell-total-price">
         <span class="header-item">
-       {{ total_discount }}
+          {{ total_discount }}
         </span>
       </td>
     </tr>
@@ -31,7 +31,7 @@
       <td class="cell-quantity"></td>
       <td class="cell-total-price">
         <span class="header-item">
-          {% price order.total.tax %}
+          {{ tax_amount }}
         </span>
       </td>
     </tr>
@@ -42,7 +42,7 @@
       <td class="cell-quantity"></td>
       <td class="cell-total-price">
         <span class="header-item-bold">
-          {% price order.total.gross %}
+          {{ total_amount }}
         </span>
       </td>
     </tr>

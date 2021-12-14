@@ -1,5 +1,6 @@
 import os
 import pytz
+from decimal import Decimal
 from datetime import datetime
 
 from weasyprint import HTML
@@ -57,6 +58,10 @@ def get_product_limit_first_page(products):
     return MAX_PRODUCTS_WITHOUT_TABLE
 
 
+def format_price(price):
+    return "MYR" + "{:.2f}".format(price)
+
+
 # Saleor doesn't have receipt feature, hence use this function to generate a receipt
 # pdf instead from an invoice object
 # note: this is copied from the generate_invoice_pdf in saleor.saleor.plugins.invoicing.utils
@@ -79,14 +84,20 @@ def generate_receipt_pdf(invoice):
         all_products[product_limit_first_page:], MAX_PRODUCTS_PER_PAGE
     )
 
-    # calculate total discount
+    # get order object directly
     order = invoice.order
-    total_discount = order.undiscounted_total_gross_amount - order.total_gross_amount
 
-    # get additional data required
+    # get meta data required
+    tax_amount = Decimal(order.metadata.get("tax_amount", 0))
     agent_name = order.metadata.get("agent_name")
     payment_ref = order.metadata.get("payment_id")
     payment_method = order.metadata.get("payment_method")
+
+    # calculate total discount
+    subtotal_amount = order.undiscounted_total_gross_amount
+    discounted_amount = order.total_gross_amount
+    total_discount = subtotal_amount - discounted_amount
+    total_amount = discounted_amount + tax_amount
 
     creation_date = datetime.now(tz=pytz.utc)
 
@@ -99,7 +110,10 @@ def generate_receipt_pdf(invoice):
             "payment_ref": payment_ref,
             "payment_method": payment_method,
             "order": order,
-            "total_discount": total_discount,
+            "tax_amount": format_price(tax_amount),
+            "total_discount": format_price(total_discount),
+            "total_amount": format_price(total_amount),
+            "subtotal_amount": format_price(subtotal_amount),
             "font_path": f"file://{font_path}",
             "products_first_page": products_first_page,
             "rest_of_products": rest_of_products,
