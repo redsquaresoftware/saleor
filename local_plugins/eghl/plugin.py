@@ -46,13 +46,17 @@ def process_transaction(request_body):
     # for checking if transaction processing is successful or not
     success = False
 
+    # log bodys here for easier debugging on server
+    # this is acceptable since there's only low volume of traffic expected
+    print("Processing transaction w/ params: ", body)
+
     try:
         # make sure eghl transaction is successful
         if status == EGHL_TRANSACTION_SUCCESS_CODE:
 
             # use dummy payment gateway to mock payment for checkout on saleor
             # raises exception if any error found from response
-            checkout_payment_create(token, taxed_amount, credit_card)
+            checkout_payment_create(token, taxed_amount)
 
             # closes checkout and create an order
             # raises exception if any error found from response
@@ -88,6 +92,7 @@ def process_transaction(request_body):
             agent_name=agent_name,
             payment_id=payment_id,
             payment_method=payment_method,
+            credit_card=credit_card,
         )
 
         # auto-generate invoice & receipt only after payment id & agent name are saved

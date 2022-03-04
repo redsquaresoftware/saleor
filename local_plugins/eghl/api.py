@@ -26,9 +26,13 @@ def send_django_graphql_request(query, variables):
 # -------------------------------
 
 
-def checkout_payment_create(token, amount, credit_card):
+def checkout_payment_create(token, amount):
     # fixed gateway
     gateway = "mirumee.payments.dummy"
+
+    # make sure the last 4 digit can be anything except as listed here
+    # reference: https://docs.saleor.io/docs/3.0/developer/available-plugins/dummy-credit-card
+    credit_card = "4000000000001234"
 
     query = """
         mutation params($token: UUID, $gateway: String!, $amount: PositiveDecimal, $creditCard: String) {
