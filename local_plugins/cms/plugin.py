@@ -116,7 +116,7 @@ def save_order_metadata(order_id, **kwargs):
 
         # make sure order exists
         order = Order.objects.get(id=id)
-        order.metadata = {**kwargs}
+        order.metadata = {k: v or "-" for k, v in kwargs.items()}
         order.save()
 
     except Order.DoesNotExist:
