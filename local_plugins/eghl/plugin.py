@@ -4,6 +4,7 @@ from saleor.plugins.base_plugin import BasePlugin
 from cognito_auth.utils import safe_get
 from .api import checkout_payment_create, checkout_complete, complete_payment_on_django
 from local_plugins.cms.plugin import process_order_on_django, save_order_metadata
+from local_plugins.cms.api import post_payment_listing_hook
 from local_plugins.receipting.api import invoice_request_for_order
 
 EGHL_TRANSACTION_SUCCESS_CODE = "0"
@@ -41,7 +42,7 @@ def process_transaction(request_body):
     # take off tax from payment amount so that it tallys with
     # the total amount in the checkout
     tax_amount, agent_name = custom.split("|", maxsplit=1)
-    taxed_amount = round(float(total_amount) - float(tax_amount), 2)
+    pre_taxed_amount = round(float(total_amount) - float(tax_amount), 2)
 
     # for checking if transaction processing is successful or not
     success = False
@@ -56,7 +57,7 @@ def process_transaction(request_body):
 
             # use dummy payment gateway to mock payment for checkout on saleor
             # raises exception if any error found from response
-            checkout_payment_create(token, taxed_amount)
+            checkout_payment_create(token, pre_taxed_amount)
 
             # closes checkout and create an order
             # raises exception if any error found from response
@@ -98,3 +99,6 @@ def process_transaction(request_body):
         # auto-generate invoice & receipt only after payment id & agent name are saved
         invoice_request_for_order(order_id=order_id)
 
+        # send request back to django to notify that all required processes are done
+        # trigger post payment listing hook on django
+        post_payment_listing_hook(payment_id=payment_id)

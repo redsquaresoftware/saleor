@@ -91,3 +91,26 @@ def create_add_on(order_id, add_ons):
         print("Error in creating Add On, full response: ", result)
         raise Exception("Add On cannot be created for order: ", order_id)
 
+
+def post_payment_listing_hook(payment_id):
+    print(f"Sending Post Payment Listing Hook request to Django - PaymentID: {payment_id}")
+
+    query = """
+        mutation params($paymentId: ID!) {
+            postPaymentListingHook(input: { paymentId: $paymentId }) {
+                ok
+                error
+            }
+        }
+    """
+
+    variables = {"paymentId": payment_id}
+
+    result = send_graphql_request(query, variables)
+
+    # try to parse and get user's email
+    error = safe_get(result, "data", "postPaymentListingHook", "error")
+
+    if error is not None and len(error) != 0:
+        print("Error in Post Payment Listing Hook request, full response: ", result)
+        raise Exception("Add On cannot be created for order: ", payment_id)
