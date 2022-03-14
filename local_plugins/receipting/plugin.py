@@ -4,11 +4,7 @@ from django.utils.text import slugify
 from django.core.files.base import ContentFile
 from saleor.core import JobStatus
 from uuid import uuid4
-from .utils import (
-    generate_invoice_number,
-    generate_receipt_number,
-    generate_receipt_pdf,
-)
+from .utils import generate_receipt_number, generate_receipt_pdf
 
 
 class ReceiptingPlugin(BasePlugin):
@@ -19,10 +15,6 @@ class ReceiptingPlugin(BasePlugin):
     CONFIGURATION_PER_CHANNEL = False
 
     def invoice_request(self, order, invoice, number, previous_value):
-        # update invoice no to follow the format requested by the client
-        invoice_number = generate_invoice_number(order)
-        invoice.update_invoice(number=invoice_number)
-        invoice.save()
 
         # receipt generation
         # -------------------

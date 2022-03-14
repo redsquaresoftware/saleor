@@ -445,7 +445,7 @@
     {% if product_set|length > 11 %}
     <!-- <div class="page-break"></div> -->
     {% endif %}
-    {% include "invoices/invoice_summary_table.html" with order=order total_discount=total_discount  %}
+    {% include "invoices/invoice_summary_table.html" with total_discount=total_discount tax_amount=tax_amount total_amount=total_amount subtotal_amount=subtotal_amount %}
     {% endif %}
     {% endfor %}
     {% endif %}
@@ -453,12 +453,12 @@
   <!-- <h2 class="footer">This is a computer generated invoice. No signature is required.</h2> -->
   <div class="footer">
     {% if order.get_last_payment %}
-    <h2>Payment Method:&nbsp;&nbsp;<span>{{ order.get_last_payment.gateway }}</span></h2>
+    <h2>Payment Method:&nbsp;&nbsp;<span>{{ payment_method }}</span></h2>
     {% else %}
     <span class="normal-text">Unpaid</span>
     {% endif %}
 
-    <h2>Payment Reference Number:&nbsp;&nbsp;<span></span></h2>
+    <h2>Payment Reference Number:&nbsp;&nbsp;<span>{{ payment_ref }}</span></h2>
     <h2>This is a computer generated invoice. No signature is required.</h2>
   </div>
 </body>

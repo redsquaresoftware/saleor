@@ -26,9 +26,13 @@ def send_django_graphql_request(query, variables):
 # -------------------------------
 
 
-def checkout_payment_create(token, amount, credit_card):
+def checkout_payment_create(token, amount):
     # fixed gateway
     gateway = "mirumee.payments.dummy"
+
+    # make sure the last 4 digit can be anything except as listed here
+    # reference: https://docs.saleor.io/docs/3.0/developer/available-plugins/dummy-credit-card
+    credit_card = "4000000000001234"
 
     query = """
         mutation params($token: UUID, $gateway: String!, $amount: PositiveDecimal, $creditCard: String) {
@@ -102,14 +106,14 @@ def checkout_complete(token):
     return result
 
 
-def update_payment_on_django(payment_id, order_id, is_success):
+def complete_payment_on_django(payment_id, order_id, is_success):
     print(
         f"Sending Payment Update request to Django - PaymentID: {payment_id} | OrderID: {order_id} | Success: {is_success}"
     )
 
     query = f"""
         mutation params($paymentId: ID!, {"$orderId: ID," if order_id else ""} $isSuccess: Boolean!) {{
-            updatePayment(input: {{paymentId: $paymentId, {"orderId: $orderId," if order_id else ""} isSuccess: $isSuccess}}) {{
+            completePayment(input: {{paymentId: $paymentId, {"orderId: $orderId," if order_id else ""} isSuccess: $isSuccess}}) {{
                 ok
                 error
             }}
@@ -128,7 +132,7 @@ def update_payment_on_django(payment_id, order_id, is_success):
     error = safe_get(result, "data", "error")
 
     if error is not None:
-        raise Exception(f"Payment cannot be updated - {payment_id}: ", error)
+        raise Exception(f"Payment cannot be completed - {payment_id}: ", error)
 
     # true indicate update success
     return True

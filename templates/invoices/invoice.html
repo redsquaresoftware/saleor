@@ -282,7 +282,7 @@
         <h3>Invoice #:&nbsp;&nbsp;<span>{{ invoice.number }}</span></h3>
         <h3>Invoice Date:&nbsp;&nbsp;<span>{{ creation_date }}</span></h3>
         <h3>Order #:&nbsp;&nbsp;<span>{{ order.id }}</span></h3>
-        <h3>Agent:&nbsp;&nbsp;<span>Agent Name</span></h3>
+        <h3>Agent:&nbsp;&nbsp;<span>{{ agent_name }}</span></h3>
       </div>
     </div>
     <div class="customer-info">
@@ -448,7 +448,7 @@
     {% if product_set|length > 11 %}
     <!-- <div class="page-break"></div> -->
     {% endif %}
-    {% include "invoices/invoice_summary_table.html" with order=order total_discount=total_discount  %}
+    {% include "invoices/invoice_summary_table.html" with order=order total_discount=total_discount tax_amount=tax_amount total_amount=total_amount subtotal_amount=subtotal_amount %}
     {% endif %}
     {% endfor %}
     {% endif %}

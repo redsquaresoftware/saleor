@@ -679,3 +679,11 @@ COGNITO_AUTH_USER_PASSWORD = os.environ.get("COGNITO_AUTH_USER_PASSWORD")
 
 SALEOR_GRAPHQL_URL = os.environ.get("SALEOR_GRAPHQL_URL")
 DJANGO_GRAPHQL_URL = os.environ.get("DJANGO_GRAPHQL_URL")
+
+
+# hide all warnings from weasyprint
+import logging
+
+logger = logging.getLogger("weasyprint")
+logger.addHandler(logging.NullHandler())
+logger.setLevel(50) # Only show errors, use 50

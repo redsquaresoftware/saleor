@@ -1,8 +1,9 @@
 from datetime import datetime
-from graphql_relay.node.node import from_global_id
+from graphql_relay.node.node import from_global_id, to_global_id
 from saleor.plugins.base_plugin import BasePlugin
 from saleor.order.models import Order
 from .api import create_ads_package, create_add_on
+from local_plugins.receipting.api import invoice_request_for_order
 
 # import all constants
 from .constants import *
@@ -19,40 +20,31 @@ class DjangoCMSPlugin(BasePlugin):
     PLUGIN_NAME = "Django CMS Integration"
     DEFAULT_ACTIVE = True
 
-    def checkout_updated(self, checkout, previous_value):
-        pass
+    # todo: just an idea, but we might be able to implement product purchase condition check here
+    # def checkout_updated(self, checkout, previous_value):
+    # pass
 
     # initial idea: use this order fully paid hook to process and add ads packages/add-ons to
     #               listing on django, however this approach comes with serious downsides
     # 1. we don't have access to transaction data, e.g. payment_id
-    # 2. we can't ensure that update_payment_on_django will be completed before this hook is triggered
+    # 2. we can't ensure that complete_payment_on_django will be completed before this hook is triggered
     # 3. (Side Effect) if an admin creates an order manually on dashboard, it'd break the overall payment flow
     # As a result, we need other get-around hacks to overcome this issue.
     #
     # Solution: don't use this fully-paid hook, just use a function call in eGHL plugin. this way, we can
     #           have access to the payment_id + we can always ensure the function will only be called
-    #           when update_payment_on_django is completed
-    def order_fully_paid(self, order, previous_value):
-        # # convert order object id to relay global id
-        # order_id = to_global_id(type(order).__name__, order.id)
-        # process_order(order_id)
-        pass
+    #           when complete_payment_on_django is completed
+    # def order_fully_paid(self, order, previous_value):
+    #     # convert order object id to relay global id
+    #     order_id = to_global_id(type(order).__name__, order.id)
 
-    # format order/invoice number
-    def order_created(self, order, previous_value):
-        # invoice format: <MY> + <calendar year> + <7 digit running number> e.g.MY20210000001
-        prefix = "MY"
-        year = f"{datetime.now().year}"
-        running_number = f"{order.id:07}"
-
-        # use 'customer_note' field as the medium to store formatted order id
-        order.customer_note = prefix + year + running_number
-        order.save()
+    #     # all graphql mutation to generate both invoice & receipt straight away
+    #     process_order_on_django(order_id=order_id)
 
 
 # main function to use to process order and add ads package/add-on to django
 # parameter: order_id must be in relay global id format
-def process_order(order_id):
+def process_order_on_django(order_id):
     try:
         # convert relay global id to object id
         _, id = from_global_id(order_id)
@@ -111,9 +103,24 @@ def process_order(order_id):
 
     except Order.DoesNotExist:
         print("Order is not found in CMS Integration - ", order_id)
-        pass
 
     except Exception as e:
         print("Error in CMS Integration plugin order_fully_paid: ", e)
+
+
+# parameter: order_id must be in relay global id format
+def save_order_metadata(order_id, **kwargs):
+    try:
+        # convert relay global id to object id
+        _, id = from_global_id(order_id)
+
+        # make sure order exists
+        order = Order.objects.get(id=id)
+        order.metadata = {k: v or "-" for k, v in kwargs.items()}
+        order.save()
+
+    except Order.DoesNotExist:
         pass
 
+    except Exception as e:
+        print("Error in CMS Integration plugin save_order_metadata: ", e)
