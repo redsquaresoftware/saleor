@@ -399,7 +399,7 @@ PLAYGROUND_ENABLED = get_bool_from_env("PLAYGROUND_ENABLED", True)
 ALLOWED_HOSTS = get_list(
     os.environ.get(
         "ALLOWED_HOSTS",
-        "localhost, 127.0.0.1, api.saleor.mywheels.com.my, dashboard.saleor.mywheels.com.my, storefront.saleor.mywheels.com.my, saleor.mywheels.com.my",
+        "localhost, 127.0.0.1, api.saleor.mywheels.com.my, dashboard.saleor.mywheels.com.my, storefront.saleor.mywheels.com.my, saleor.mywheels.com.my, saleor.staging.mywheels.my, dsahboard.saleor.mywheels.my",
     )
 )
 ALLOWED_GRAPHQL_ORIGINS = get_list(os.environ.get("ALLOWED_GRAPHQL_ORIGINS", "*"))
@@ -679,6 +679,8 @@ COGNITO_AUTH_USER_PASSWORD = os.environ.get("COGNITO_AUTH_USER_PASSWORD")
 
 SALEOR_GRAPHQL_URL = os.environ.get("SALEOR_GRAPHQL_URL")
 DJANGO_GRAPHQL_URL = os.environ.get("DJANGO_GRAPHQL_URL")
+
+CORS_ALLOW_HEADERS = [ "accept", "accept-encoding", "authorization", "content-type", "dnt", "origin", "user-agent", "x-csrftoken", "x-requested-with", "authorization-bearer", ]
 
 
 # hide all warnings from weasyprint
