@@ -39,6 +39,10 @@ def process_transaction(request_body):
     credit_card = body.get("CardNoMask")
     status = str(body.get("TxnStatus"))
 
+    # log bodys here for easier debugging on server
+    # this is acceptable since there's only low volume of traffic expected
+    print("Processing transaction w/ params: ", body)
+
     # take off tax from payment amount so that it tallys with
     # the total amount in the checkout
     tax_amount, agent_name = custom.split("|", maxsplit=1)
@@ -46,10 +50,6 @@ def process_transaction(request_body):
 
     # for checking if transaction processing is successful or not
     success = False
-
-    # log bodys here for easier debugging on server
-    # this is acceptable since there's only low volume of traffic expected
-    print("Processing transaction w/ params: ", body)
 
     try:
         # make sure eghl transaction is successful
