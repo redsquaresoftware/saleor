@@ -106,7 +106,7 @@
     }
 
     .content-padded {
-      padding: 27px;
+      padding: 27px 0px;
     }
 
     .content-tight-padded {
@@ -138,6 +138,10 @@
 
     .summary-row>td {
       padding: 7px 0 7px 0;
+    }
+
+    .summary-row>.cell-total-price {
+      padding: 7px 12px 7px 0;
     }
 
     .padded-font {
@@ -217,6 +221,26 @@
       font-weight: bolder;
     }
 
+    .company-info-row {
+      margin-left: -10px !important;
+    }
+
+    .company-info-container {
+      height: 100px;
+      position: relative;
+    }
+
+    .company-info {
+      position: absolute;
+      bottom: 0;
+      left: 8px;
+    }
+
+    .invoice-info {
+      display: block;
+      text-align: right;
+    }
+
     .header h3 {
       font-size: 16px;
       font-weight: 700;
@@ -257,17 +281,18 @@
 <body>
   <div class="header">
     <div class="row" style="justify-content: space-between;">
-      <div class="col-6 company-detail">
-        <div class="row">
-          <div class="col-4">
-            <!-- <img width="150" src="./image.png"> -->
-            <img style="width:120px;height:100px;" src="https://mywheels-production.s3.ap-southeast-1.amazonaws.com/logo/cp_logo.png" />
+      <div class="col-8 company-detail">
+        <div class="row company-info-row">
+          <div>
+            <!-- maintain logo image aspect ratio -->
+            <img style="width:189px;height:100px;" src="https://mywheels-production.s3.ap-southeast-1.amazonaws.com/logo/cp_logo.png" />
           </div>
-          <div class="col">
-            <h2>The China Press Berhad</h2>
-            <h3>Company Reg. no. 194701000047 (1508-X)</h3>
-            <h3>(Service Tax ID: W10-1808-32001095)</h3>
-
+          <div class="col company-info-container">
+            <div class="company-info">
+              <h2>The China Press Berhad</h2>
+              <h3>Company Reg. no. 194701000047 (1508-X)</h3>
+              <h3>(Service Tax ID: W10-1808-32001095)</h3>
+            </div>
           </div>
         </div>
 
@@ -278,9 +303,9 @@
             (Agency)</span></h3>
         <h3>Fax:&nbsp;&nbsp;<span>03-2283 3519 (Account Dept)</span></h3>
       </div>
-      <div class="col-6">
-        <h3>Invoice #:&nbsp;&nbsp;<span>{{ invoice.number }}</span></h3>
-        <h3>Invoice Date:&nbsp;&nbsp;<span>{{ creation_date }}</span></h3>
+      <div class="col-4 invoice-info">
+        <h3>Receipt #:&nbsp;&nbsp;<span>{{ invoice.number }}</span></h3>
+        <h3>Receipt Date:&nbsp;&nbsp;<span>{{ creation_date }}</span></h3>
         <h3>Order #:&nbsp;&nbsp;<span>{{ order.id }}</span></h3>
       </div>
     </div>
@@ -460,8 +485,8 @@
     <span class="normal-text">Unpaid</span>
     {% endif %}
 
-    <h2>Payment Reference Number:&nbsp;&nbsp;<span>{{ payment_ref }}</span></h2>
-    <h2>This is a computer generated invoice. No signature is required.</h2>
+    <!-- <h2>Payment Reference Number:&nbsp;&nbsp;<span>{{ payment_ref }}</span></h2> -->
+    <h2>This is a computer generated receipt. No signature is required.</h2>
   </div>
 </body>
 
