@@ -38,7 +38,7 @@
 
     body {
       font-family: Custom;
-      padding: 8px;
+      padding: 16px;
     }
 
     .section-header,
@@ -458,25 +458,9 @@
     <div class="content-separator">&nbsp;</div>
   </div> -->
   <div class="content-padded">
-    <!-- <span class="header-title">ITEMS ORDERED</span> -->
     {% include "invoices/invoice_products_table.html" with products=products_first_page %}
-    {% if not rest_of_products|length %}
-    {% if products_first_page|length == 4 %}
-    <!-- <div class="page-break"></div> -->
-    {% endif %}
-    {% include "invoices/invoice_summary_table.html" with order=order %}
-    {% else %}
-    {% for product_set in rest_of_products %}
-    <!-- <div class="page-break"></div> -->
-    {% include "invoices/invoice_products_table.html" with products=product_set %}
-    {% if forloop.last %}
-    {% if product_set|length > 11 %}
-    <!-- <div class="page-break"></div> -->
-    {% endif %}
+    <div></div>
     {% include "invoices/invoice_summary_table.html" with order=order total_discount=total_discount tax_amount=tax_amount total_amount=total_amount subtotal_amount=subtotal_amount %}
-    {% endif %}
-    {% endfor %}
-    {% endif %}
   </div>
   <!-- <h2 class="footer">This is a computer generated invoice. No signature is required.</h2> -->
   <div class="footer">
