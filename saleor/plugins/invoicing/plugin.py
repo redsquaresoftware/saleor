@@ -35,9 +35,9 @@ class InvoicingPlugin(BasePlugin):
         invoice.update_invoice(number=invoice_number)
         file_content, creation_date = generate_invoice_pdf(invoice)
         invoice.created = creation_date
-        slugified_invoice_number = slugify(invoice_number)
+        slugified_invoice_number = slugify(invoice_number).upper()
         invoice.invoice_file.save(
-            f"invoice-{slugified_invoice_number}-order-{order.id}-{uuid4()}.pdf",
+            f"Invoice-{slugified_invoice_number}-order-{order.id}-{uuid4()}.pdf",
             ContentFile(file_content),
         )
         invoice.status = JobStatus.SUCCESS
