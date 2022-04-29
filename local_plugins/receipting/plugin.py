@@ -30,7 +30,7 @@ class ReceiptingPlugin(BasePlugin):
         receipt.created = creation_date
         slugified_receipt_number = slugify(receipt_number).upper()
         receipt.invoice_file.save(
-            f"Receipt-{slugified_receipt_number}-order-{order.id}-{uuid4()}.pdf",
+            f"Receipt-{slugified_receipt_number}.pdf",
             ContentFile(receipt_pdf),
         )
 
