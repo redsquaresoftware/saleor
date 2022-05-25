@@ -22,9 +22,12 @@ from sentry_sdk.integrations.logging import ignore_logger
 from . import patched_print_object
 from .core.languages import LANGUAGES as CORE_LANGUAGES
 
-
 import json
 from urllib import request
+
+from dotenv import load_dotenv
+
+load_dotenv()  # take environment variables from .env.
 
 
 def get_list(text):
@@ -224,7 +227,9 @@ INSTALLED_APPS = [
     "django_countries",
     "django_filters",
     "phonenumber_field",
-    "saleor.cognito_auth_layer",
+    # Custom local apps
+    "cognito_auth",
+    "local_plugins",
 ]
 
 ENABLE_DJANGO_EXTENSIONS = get_bool_from_env("ENABLE_DJANGO_EXTENSIONS", False)
@@ -390,7 +395,13 @@ TEST_RUNNER = "saleor.tests.runner.PytestTestRunner"
 
 PLAYGROUND_ENABLED = get_bool_from_env("PLAYGROUND_ENABLED", True)
 
-ALLOWED_HOSTS = get_list(os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1"))
+# To update domain name update here
+ALLOWED_HOSTS = get_list(
+    os.environ.get(
+        "ALLOWED_HOSTS",
+        "localhost, 127.0.0.1, api.saleor.mywheels.com.my, dashboard.saleor.mywheels.com.my, storefront.saleor.mywheels.com.my, saleor.mywheels.com.my, saleor.staging.mywheels.my, dsahboard.saleor.mywheels.my",
+    )
+)
 ALLOWED_GRAPHQL_ORIGINS = get_list(os.environ.get("ALLOWED_GRAPHQL_ORIGINS", "*"))
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
@@ -489,10 +500,6 @@ CELERY_BEAT_SCHEDULE = {
         "task": "saleor.warehouse.tasks.delete_empty_allocations_task",
         "schedule": timedelta(days=1),
     },
-    "deactivate-preorder-for-variants": {
-        "task": "saleor.product.tasks.deactivate_preorder_for_variants_task",
-        "schedule": timedelta(hours=1),
-    },
 }
 
 # Change this value if your application is running behind a proxy,
@@ -559,7 +566,14 @@ for entry_point in installed_plugins:
             INSTALLED_APPS.append(entry_point.name)
         EXTERNAL_PLUGINS.append(plugin_path)
 
-PLUGINS = BUILTIN_PLUGINS + EXTERNAL_PLUGINS
+# Custom local plugins
+LOCAL_PLUGINS = [
+    "local_plugins.cms.plugin.DjangoCMSPlugin",
+    "local_plugins.eghl.plugin.eGHLPaymentGatewayPlugin",
+    "local_plugins.receipting.plugin.ReceiptingPlugin",
+]
+
+PLUGINS = BUILTIN_PLUGINS + EXTERNAL_PLUGINS + LOCAL_PLUGINS
 
 if (
     not DEBUG
@@ -664,10 +678,21 @@ COGNITO_JWT_AUTH = {
     "AUTH_HEADER_PREFIX": "Bearer",
 }
 
-COGNITO_AUTH_LAYER_APP_TOKEN = os.environ.get("COGNITO_AUTH_LAYER_APP_TOKEN")
-COGNITO_AUTH_LAYER_USER_PASSWORD = os.environ.get("COGNITO_AUTH_LAYER_USER_PASSWORD")
+COGNITO_AUTH_APP_TOKEN = os.environ.get("COGNITO_AUTH_APP_TOKEN")
+COGNITO_AUTH_USER_PASSWORD = os.environ.get("COGNITO_AUTH_USER_PASSWORD")
 
 # Saleor Integration
 # --------------------------------------
 
 SALEOR_GRAPHQL_URL = os.environ.get("SALEOR_GRAPHQL_URL")
+DJANGO_GRAPHQL_URL = os.environ.get("DJANGO_GRAPHQL_URL")
+
+CORS_ALLOW_HEADERS = [ "accept", "accept-encoding", "authorization", "content-type", "dnt", "origin", "user-agent", "x-csrftoken", "x-requested-with", "authorization-bearer", ]
+
+
+# hide all warnings from weasyprint
+import logging
+
+logger = logging.getLogger("weasyprint")
+logger.addHandler(logging.NullHandler())
+logger.setLevel(50) # Only show errors, use 50

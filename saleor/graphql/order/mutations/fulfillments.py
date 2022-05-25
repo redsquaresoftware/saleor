@@ -263,8 +263,6 @@ class OrderFulfill(BaseMutation):
             "allow_stock_to_be_exceeded", False
         )
 
-        approved = info.context.site.settings.fulfillment_auto_approve
-
         try:
             fulfillments = create_fulfillments(
                 user,
@@ -274,8 +272,7 @@ class OrderFulfill(BaseMutation):
                 manager,
                 context.site.settings,
                 notify_customer,
-                allow_stock_to_be_exceeded=allow_stock_to_be_exceeded,
-                approved=approved,
+                allow_stock_to_be_exceeded,
             )
         except InsufficientStock as exc:
             errors = prepare_insufficient_stock_order_validation_errors(exc)

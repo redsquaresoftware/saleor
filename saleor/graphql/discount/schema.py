@@ -53,8 +53,8 @@ class DiscountQueries(graphene.ObjectType):
         sort_by=SaleSortingInput(description="Sort sales."),
         query=graphene.String(
             description=(
-                "Search sales by name, value or type. "
-                f"{DEPRECATED_IN_3X_INPUT} Use `filter.search` input instead."
+                "Search sales by name, value or type. DEPRECATED: Will be removed in "
+                "Saleor 4.0. Use `filter.search` input instead."
             )
         ),
         channel=graphene.String(
@@ -78,8 +78,8 @@ class DiscountQueries(graphene.ObjectType):
         sort_by=VoucherSortingInput(description="Sort voucher."),
         query=graphene.String(
             description=(
-                "Search vouchers by name or code. "
-                f"{DEPRECATED_IN_3X_INPUT} Use `filter.search` input instead."
+                "Search vouchers by name or code. DEPRECATED: Will be removed in "
+                "Saleor 4.0. Use `filter.search` input instead."
             )
         ),
         channel=graphene.String(

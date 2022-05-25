@@ -43,7 +43,8 @@ class ChannelSortInputObjectType(SortInputObjectType):
         graphene.String,
         description=(
             "Specifies the channel in which to sort the data. "
-            f"{DEPRECATED_IN_3X_INPUT} Use root-level channel argument instead."
+            "DEPRECATED: Will be removed in Saleor 4.0."
+            "Use root-level channel argument instead."
         ),
     )
 

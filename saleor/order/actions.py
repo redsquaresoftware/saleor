@@ -504,17 +504,18 @@ def clean_mark_order_as_paid(order: "Order"):
         )
 
 
-def _decrease_stocks(order_lines_info, manager, allow_stock_to_be_exceeded=False):
+@traced_atomic_transaction()
+def fulfill_order_lines(
+    order_lines_info: Iterable["OrderLineData"],
+    allow_stock_to_be_exceeded: bool = False,
+):
+    """Fulfill order line with given quantity."""
     lines_to_decrease_stock = get_order_lines_with_track_inventory(order_lines_info)
     if lines_to_decrease_stock:
         decrease_stock(
             lines_to_decrease_stock,
-            manager,
             allow_stock_to_be_exceeded=allow_stock_to_be_exceeded,
         )
-
-
-def _increase_order_line_quantity(order_lines_info):
     order_lines = []
     for line_info in order_lines_info:
         line = line_info.line
@@ -587,9 +588,6 @@ def _create_fulfillment_lines(
     warehouse_pk: str,
     lines_data: List[Dict],
     channel_slug: str,
-    gift_card_lines_info: List[GiftCardLineData],
-    manager: "PluginsManager",
-    decrease_stock: bool = True,
     allow_stock_to_be_exceeded: bool = False,
 ) -> List[FulfillmentLine]:
     """Modify stocks and allocations. Return list of unsaved FulfillmentLines.
@@ -607,10 +605,6 @@ def _create_fulfillment_lines(
                     ...
                 ]
         channel_slug (str): Channel for which fulfillment lines should be created.
-        gift_card_lines_info (List): List with information required
-            to create gift cards.
-        manager (PluginsManager): Plugin manager from given context
-        decrease_stock (Bool): Stocks will get decreased if this is True.
         allow_stock_to_be_exceeded (bool): If `True` then stock quantity could exceed.
             Default value is set to `False`.
 
@@ -683,9 +677,7 @@ def _create_fulfillment_lines(
         raise InsufficientStock(insufficient_stocks)
 
     if lines_info:
-        if decrease_stock:
-            _decrease_stocks(lines_info, manager, allow_stock_to_be_exceeded)
-        _increase_order_line_quantity(lines_info)
+        fulfill_order_lines(lines_info, allow_stock_to_be_exceeded)
 
     return fulfillment_lines
 
@@ -699,7 +691,6 @@ def create_fulfillments(
     manager: "PluginsManager",
     site_settings: "SiteSettings",
     notify_customer: bool = True,
-    approved: bool = True,
     allow_stock_to_be_exceeded: bool = False,
 ) -> List[Fulfillment]:
     """Fulfill order.
@@ -725,9 +716,6 @@ def create_fulfillments(
         manager (PluginsManager): Base manager for handling plugins logic.
         notify_customer (bool): If `True` system send email about
             fulfillments to customer.
-        site_settings (SiteSettings): Site settings used for creating gift cards.
-        approved (Boolean): fulfillments will have status fulfilled if it's True,
-            otherwise waiting_for_approval.
         allow_stock_to_be_exceeded (bool): If `True` then stock quantity could exceed.
             Default value is set to `False`.
 
@@ -757,10 +745,7 @@ def create_fulfillments(
                 warehouse_pk,
                 fulfillment_lines_for_warehouses[warehouse_pk],
                 order.channel.slug,
-                gift_card_lines_info,
-                manager,
-                decrease_stock=approved,
-                allow_stock_to_be_exceeded=allow_stock_to_be_exceeded,
+                allow_stock_to_be_exceeded,
             )
         )
 

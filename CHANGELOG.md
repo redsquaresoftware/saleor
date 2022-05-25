@@ -26,6 +26,9 @@ All notable, unreleased changes to this project will be documented in this file.
     * X-Saleor-Domain -> Saleor-Domain
     * X-Saleor-Signature -> Saleor-Signature
     * X-Saleor-HMAC-SHA256 -> Saleor-HMAC-SHA256
+## [Unreleased]
+
+- Improve draft orders and orders webhooks - #SALEOR-4008 by @jakubkuc
 - Extend editorjs validator to accept blocks different than text - #SALEOR-3354 by @mociepka
 - Add query contains only schema validation - #6827 by @fowczarek
 - Add introspection caching - #6871 by @fowczarek
@@ -83,6 +86,8 @@ All notable, unreleased changes to this project will be documented in this file.
 - Allow passing metadata to `accountRegister` mutation - #7152 by @piotrgrundas
 - Fix incorrect payment data for klarna - #7150 by @IKarbowiak
 - Drop deleted images from storage - #7129 by @IKarbowiak
+- Fix export with empty assignment values - #7214 by @IKarbowiak
+- Change exported file name - #7222 by @IKarbowiak
 - Fix core sorting on related fields - #7195 by @tomaszszymanski129
 - Fix variants dataloaders when querying with default channel - #7206 by @tomaszszymanski129
 - Performance upgrade on orders query with `subtotal` field - #7174 by @tomaszszymanski129
@@ -166,6 +171,13 @@ All notable, unreleased changes to this project will be documented in this file.
   - Handle `SameSite` cookie attribute in jwt refresh token middleware - #8209 by @jakubkuc
 
 
+- Allow impersonating user by an app/staff - #7754 by @korycins:
+  - Add `customerId` to `checkoutCustomerAttach` mutation
+  - Add new permision `IMPERSONATE_USER`
+- Fix missing transaction id in Braintree - #8110 by @fowczarek
+- Fix GraphQL federation support. - #7771 #8107 by @rafalp
+- Remove unnecessary database lock on discount during checkout complete mutation - #8174 by @fowczarek
+- Fix cursor-based pagination in products search - #8011 #8211 by @rafalp
 
 ### Breaking
 - Multichannel MVP: Multicurrency - #6242 by @fowczarek @d-wysocki

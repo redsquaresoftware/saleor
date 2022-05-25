@@ -39,8 +39,7 @@ from ...order import models as order_models
 from ...product import models as product_models
 from ...product.models import ProductChannelListing
 from ...shipping import models as shipping_models
-from ...warehouse import models as warehouse_models
-from ...warehouse.availability import check_stock_and_preorder_quantity_bulk
+from ...warehouse.availability import check_stock_quantity_bulk
 from ..account.i18n import I18nMixin
 from ..account.types import AddressInput
 from ..channel.utils import clean_channel
@@ -62,7 +61,6 @@ from ..order.types import Order
 from ..product.types import ProductVariant
 from ..shipping.types import ShippingMethod
 from ..utils import get_user_or_app_from_context
-from ..warehouse.types import Warehouse
 from .types import Checkout, CheckoutLine
 from .utils import prepare_insufficient_stock_checkout_validation_error
 
@@ -169,13 +167,8 @@ def check_lines_quantity(
                 }
             )
     try:
-        check_stock_and_preorder_quantity_bulk(
-            variants,
-            country,
-            quantities,
-            channel_slug,
-            existing_lines=existing_lines,
-            replace=replace,
+        check_stock_quantity_bulk(
+            variants, country, quantities, channel_slug, existing_lines, replace
         )
     except InsufficientStock as e:
         errors = [
@@ -510,11 +503,6 @@ class CheckoutLinesAdd(BaseMutation):
                 checkout_info, checkout_info.shipping_address, lines, discounts, manager
             )
         )
-        checkout_info.valid_pick_up_points = (
-            get_valid_collection_points_for_checkout_info(
-                checkout_info.shipping_address, lines, checkout_info
-            )
-        )
         return lines
 
     @classmethod
@@ -664,6 +652,13 @@ class CheckoutCustomerAttach(BaseMutation):
             required=False,
             description=(
                 f"The ID of the checkout. {DEPRECATED_IN_3X_INPUT} Use token instead."
+            ),
+        )
+        customer_id = graphene.ID(
+            required=False,
+            description=(
+                "ID of customer to attach to checkout. Can be used to attach customer "
+                "to checkout by staff or app. Requires IMPERSONATE_USER permission."
             ),
         )
         customer_id = graphene.ID(

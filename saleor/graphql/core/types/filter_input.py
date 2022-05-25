@@ -70,7 +70,8 @@ class ChannelFilterInputObjectType(FilterInputObjectType):
         String,
         description=(
             "Specifies the channel by which the data should be filtered. "
-            f"{DEPRECATED_IN_3X_INPUT} Use root-level channel argument instead."
+            "DEPRECATED: Will be removed in Saleor 4.0."
+            "Use root-level channel argument instead."
         ),
     )
 

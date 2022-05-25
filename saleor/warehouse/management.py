@@ -313,7 +313,6 @@ def decrease_allocations(lines_info: Iterable["OrderLineData"], manager):
 @traced_atomic_transaction()
 def decrease_stock(
     order_lines_info: Iterable["OrderLineData"],
-    manager,
     update_stocks=True,
     allow_stock_to_be_exceeded: bool = False,
 ):

@@ -8,7 +8,6 @@ from graphene_django import DjangoObjectType
 from ...channel import models
 from ...core.permissions import ChannelPermissions
 from ..core.connection import CountableDjangoObjectType
-from ..core.descriptions import ADDED_IN_31
 from ..core.types import CountryDisplay
 from ..decorators import permission_required
 from ..meta.types import ObjectWithMetadata
@@ -77,9 +76,9 @@ class Channel(CountableDjangoObjectType):
     default_country = graphene.Field(
         CountryDisplay,
         description=(
-            f"{ADDED_IN_31} Default country for the channel. Default country can be "
-            "used in checkout to determine the stock quantities or calculate taxes "
-            "when the country was not explicitly provided."
+            "Default country for the channel. Default country can be used in checkout "
+            "to determine the stock quantities or calculate taxes when the country was "
+            "not explicitly provided."
         ),
         required=True,
     )

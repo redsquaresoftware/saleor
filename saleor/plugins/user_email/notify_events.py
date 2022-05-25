@@ -119,23 +119,6 @@ def send_account_delete(payload: dict, config: dict, plugin_configuration: list)
     )
 
 
-def send_gift_card(payload: dict, config: dict, plugin_configuration: list):
-    recipient_email = payload["recipient_email"]
-    template = get_email_template_or_default(
-        plugin_configuration,
-        constants.SEND_GIFT_CARD_TEMPLATE_FIELD,
-        constants.SEND_GIFT_CARD_DEFAULT_TEMPLATE,
-        constants.DEFAULT_EMAIL_TEMPLATES_PATH,
-    )
-
-    subject = get_email_subject(
-        plugin_configuration,
-        constants.SEND_GIFT_CARD_SUBJECT_FIELD,
-        constants.SEND_GIFT_CARD_DEFAULT_SUBJECT,
-    )
-    send_gift_card_email_task.delay(recipient_email, payload, config, subject, template)
-
-
 def send_account_set_customer_password(
     payload: dict, config: dict, plugin_configuration: list
 ):

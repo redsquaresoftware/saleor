@@ -211,4 +211,4 @@ class WarehouseByIdLoader(DataLoader):
 
     def batch_load(self, keys: Iterable[UUID]) -> List[Optional[Warehouse]]:
         warehouses = Warehouse.objects.in_bulk(keys)
-        return [warehouses.get(warehouse_uuid) for warehouse_uuid in keys]
+        return [warehouses.get(UUID(warehouse_uuid)) for warehouse_uuid in keys]

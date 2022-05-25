@@ -11,7 +11,7 @@ from ..core.permissions import (
     ProductPermissions,
     has_one_of_permissions,
 )
-from ..core.permissions import permission_required as core_permission_required
+from ..core.permissions import permissions_required as core_permission_required
 from .utils import get_user_or_app_from_context
 
 

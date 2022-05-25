@@ -8,7 +8,10 @@ from ...core import JobStatus
 from ...invoice.models import Invoice
 from ...order.models import Order
 from ..base_plugin import BasePlugin
-from .utils import generate_invoice_number, generate_invoice_pdf
+from .utils import generate_invoice_pdf
+
+# from .utils import generate_invoice_number
+from local_plugins.receipting.utils import generate_invoice_number
 
 
 class InvoicingPlugin(BasePlugin):
@@ -25,13 +28,16 @@ class InvoicingPlugin(BasePlugin):
         number: Optional[str],
         previous_value: Any,
     ) -> Any:
-        invoice_number = generate_invoice_number()
+        # update invoice no to follow the format requested by the client
+        # invoice_number = generate_invoice_number()
+        invoice_number = generate_invoice_number(order)
+
         invoice.update_invoice(number=invoice_number)
         file_content, creation_date = generate_invoice_pdf(invoice)
         invoice.created = creation_date
-        slugified_invoice_number = slugify(invoice_number)
+        slugified_invoice_number = slugify(invoice_number).upper()
         invoice.invoice_file.save(
-            f"invoice-{slugified_invoice_number}-order-{order.id}-{uuid4()}.pdf",
+            f"Invoice-{slugified_invoice_number}.pdf",
             ContentFile(file_content),
         )
         invoice.status = JobStatus.SUCCESS

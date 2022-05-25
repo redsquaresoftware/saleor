@@ -160,8 +160,8 @@ class Shop(graphene.ObjectType):
         language_code=graphene.Argument(
             LanguageCodeEnum,
             description=(
-                "A language code to return the translation for. "
-                f"{DEPRECATED_IN_3X_INPUT}"
+                "DEPRECATED: This argument will be removed in Saleor 4.0. "
+                "A language code to return the translation for."
             ),
         ),
         description="List of countries available in the shop.",

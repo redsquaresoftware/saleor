@@ -121,7 +121,6 @@ def check_stock_quantity_bulk(
     country_code: str,
     quantities: Iterable[int],
     channel_slug: str,
-    additional_filter_lookup: Optional[Dict[str, Any]] = None,
     existing_lines: Iterable = None,
     replace=False,
 ):

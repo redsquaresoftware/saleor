@@ -157,18 +157,6 @@ def try_payment_action(order, user, app, payment, func, *args, **kwargs):
         )
 
 
-def clean_order_refund(order):
-    if order_has_gift_card_lines(order):
-        raise ValidationError(
-            {
-                "id": ValidationError(
-                    "Cannot refund order with gift card lines.",
-                    code=OrderErrorCode.CANNOT_REFUND.value,
-                )
-            }
-        )
-
-
 def get_webhook_handler_by_order_status(status, info):
     if status == OrderStatus.DRAFT:
         return info.context.plugins.draft_order_updated

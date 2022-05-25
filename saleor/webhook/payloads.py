@@ -533,6 +533,7 @@ def generate_fulfillment_lines_payload(fulfillment: Fulfillment):
         "order_line__variant__product__product_type", "stock"
     ).filter(fulfillment=fulfillment)
     line_fields = ("quantity",)
+
     return serializer.serialize(
         lines,
         fields=line_fields,
@@ -540,7 +541,6 @@ def generate_fulfillment_lines_payload(fulfillment: Fulfillment):
             "product_name": lambda fl: fl.order_line.product_name,
             "variant_name": lambda fl: fl.order_line.variant_name,
             "product_sku": lambda fl: fl.order_line.product_sku,
-            "product_variant_id": lambda fl: fl.order_line.product_variant_id,
             "weight": (
                 lambda fl: fl.order_line.variant.get_weight().g
                 if fl.order_line.variant

@@ -349,12 +349,6 @@ class InactivePaymentGateway(BasePlugin):
     def process_payment(self, payment_information, previous_value):
         pass
 
-    def get_supported_currencies(self, previous_value):
-        return self.SUPPORTED_CURRENCIES
-
-    def get_payment_config(self, previous_value):
-        return self.CLIENT_CONFIG
-
 
 ACTIVE_PLUGINS = (
     ChannelPluginSample,

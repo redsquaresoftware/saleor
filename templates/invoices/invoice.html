@@ -1,329 +1,478 @@
 {% load price from taxed_prices %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="./stylesheet.css" media="screen" />
+<link href="https://fonts.googleapis.com/css?family=Poppins:400,500,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+  integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+  integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
+</script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+  integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+</script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+  integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
+</script>
 <!DOCTYPE html>
 <html>
 
 <head>
-    <style>
-        @page {
-            margin: 0.5cm;
-            @bottom-right {
-                content: counter(page) " of " counter(pages);
-                font-size: 12px;
-                letter-spacing: 0.02em;
-                color: rgba(40, 35, 74, 0.6);
-                margin: -15px 28px 40px 0;
-            }
-        }
+  <style>
+    @page {
+      margin: 0.5cm;
 
-        @font-face {
-            font-family: Custom;
-            font-style: normal;
-            src: url({{ font_path }}) format('truetype');
-        }
+      @bottom-right {
+        content: counter(page) " of "counter(pages);
+        font-size: 12px;
+        letter-spacing: 0.02em;
+        color: rgba(40, 35, 74, 0.6);
+        margin: -15px 28px 40px 0;
+      }
+    }
 
-        body {
-            font-family: Custom;
-        }
+    @font-face {
+      font-family: Custom;
+      font-style: normal;
+      src: url({{ font_path }}) format('truetype');
+    }
 
-        .section-header,
-        .section-invoice-info {
-            background-color: #EFF5F8;
-            height: 255px;
-        }
+    body {
+      font-family: Custom;
+      padding: 64px;
+    }
 
-        .section-left {
-            width: 50%;
-            float: left;
-        }
+    .section-header,
+    .section-invoice-info {
 
-        .section-right {
-            width: 50%;
-            float: right;
-        }
+      height: 255px;
+    }
 
-        .header-category {
-            font-size: 14px;
-            letter-spacing: 0.05em;
-            color: rgba(40, 35, 74, 0.6);
-            line-height: 1.8;
-        }
+    .section-left {
+      width: 50%;
+      float: left;
+    }
 
-        .header-category-small {
-            font-size: 11px;
-            letter-spacing: 0.05em;
-            color: rgba(40, 35, 74, 0.6);
-            line-height: 1.8;
-        }
+    .section-right {
+      width: 50%;
+      float: right;
+    }
 
-        .header-item {
-            font-weight: bold;
-            font-size: 14px;
-            color: #28234A;
-            display: block;
-            padding-bottom: 5px;
-            font-family: Inter;
-            letter-spacing: 0.05em;
-            line-height: 13px;
-        }
+    .header-category {
+      font-size: 14px;
+      letter-spacing: 0.05em;
+      color: rgba(40, 35, 74, 0.6);
+      line-height: 1.8;
+    }
 
-        .header-title {
-            display: block;
-            padding-bottom: 5px;
-            font-family: Inter;
-            letter-spacing: -0.02em;
-            font-style: normal;
-            font-weight: 600;
-            font-size: 14px;
-            line-height: 13px;
-            color: #28234A;
-        }
+    .header-category-small {
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      color: rgba(40, 35, 74, 0.6);
+      line-height: 1.8;
+    }
 
-        .content-padded {
-            padding: 27px;
-        }
+    .header-item {
 
-        .content-tight-padded {
-            padding: 0 27px 0 27px;
-        }
+      font-size: 14px;
+      color: #28234A;
+      display: block;
+      padding-bottom: 5px;
+      font-family: Inter;
+      letter-spacing: 0.05em;
+      line-height: 13px;
+    }
 
-        .padded-top {
-            padding-top: 30px;
-        }
+    .header-item-bold {
+      font-size: 14px;
+      color: #28234A;
+      display: block;
+      padding-bottom: 5px;
+      font-family: Inter;
+      letter-spacing: 0.05em;
+      line-height: 13px;
+      font-weight: bold;
+    }
 
-        .normal-text {
-            font-size: 15px;
-            color: #534f6e;
-            line-height: 143.52%;
-        }
+    .header-title {
+      display: block;
+      padding-bottom: 5px;
+      font-family: Inter;
+      letter-spacing: -0.02em;
+      font-style: normal;
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 13px;
+      color: #28234A;
+    }
 
-        .normal-text-table {
-            font-size: 15px;
-            color: #28234A;
-            line-height: 143.52%;
-        }
+    .content-padded {
+      padding: 27px 0px;
+    }
 
-        .summary-row {
-            line-height: normal;
-        }
+    .content-tight-padded {
+      padding: 0 27px 0 27px;
+    }
 
-        .padded-font {
-            margin-top: 10px;
-        }
+    .padded-top {
+      padding-top: 30px;
+    }
 
-        .padded-font-sm {
-            margin-top: 3px;
-        }
+    .normal-text {
+      font-size: 15px;
+      color: #534f6e;
+      line-height: 143.52%;
+    }
 
-        .padded-font {
-            margin-top: 1px;
-        }
+    .normal-text-table {
+      font-size: 15px;
+      color: #28234A;
+      line-height: 143.52%;
+    }
 
-        .products-table {
-            width: 100%;
-            line-height: 1.4;
-        }
+    .normal-text-table-bold {
+      font-size: 15px;
+      color: #28234A;
+      line-height: 143.52%;
+      font-weight: bolder;
+    }
 
-        .summary-table {
-            width: 100%;
-            line-height: 1.8;
-            padding-top: 20px;
-        }
+    .summary-row>td {
+      padding: 7px 0 7px 0;
+    }
 
-        .row-category > td,
-        .row-product > td {
-            padding: 7px 0 7px 0;
-            border-bottom: 2px solid #CEE3ED;
-        }
+    .summary-row>.cell-total-price {
+      padding: 7px 12px 7px 0;
+    }
 
-        .cell-product {
-            width: 50%;
-        }
+    .padded-font {
+      margin-top: 10px;
+    }
 
-        .cell-price {
-            width: 20%;
-            text-align: right;
-        }
+    .padded-font-sm {
+      margin-top: 3px;
+    }
 
-        .cell-price-content {
-            padding-right: 57px;
-        }
+    .padded-font {
+      margin-top: 1px;
+    }
 
-        .cell-quantity {
-            width: 15%;
-            text-align: right;
-        }
+    .products-table {
+      width: 100%;
+      line-height: 1.4;
+    }
 
-        .cell-quantity-content {
-            padding-right: 35px;
-        }
+    .summary-table {
+      width: 100%;
+      line-height: 1.8;
+      padding-top: 20px;
+    }
 
-        .cell-total-price {
-            width: 15%;
-            text-align: right;
-        }
+    .row-category>td,
+    .row-product>td {
+      padding: 7px 0 7px 0;
+      border-bottom: 1px solid gainsboro;
+    }
 
-        .cell-summary {
-            width: 80%;
-            text-align: right;
-            padding-right: 30px;
-        }
+    .cell-product {
+      width: 50%;
+    }
 
-        .content-separator {
-            display: inline-block;
-            width: 100%;
-            border-bottom: 2px solid #CEE3ED;
-        }
+    .cell-price {
+      width: 20%;
+      text-align: right;
+    }
 
-        .page-break {
-            page-break-before: always;
-        }
-    </style>
+    .cell-price-content {
+      padding-right: 57px;
+    }
+
+    .cell-quantity {
+      width: 15%;
+      text-align: right;
+    }
+
+    .cell-quantity-content {
+      padding-right: 35px;
+    }
+
+    .cell-total-price {
+      width: 15%;
+      text-align: right;
+    }
+
+    .cell-summary {
+      width: 80%;
+      text-align: right;
+      padding-right: 30px;
+    }
+
+    .content-separator {
+      display: inline-block;
+      width: 100%;
+      border-bottom: 2px solid #CEE3ED;
+    }
+
+    .page-break {
+      page-break-before: always;
+    }
+
+    .company-detail h2 {
+      font-size: 20px;
+      font-weight: bolder;
+    }
+
+    .company-info-row {
+      margin-left: -10px !important;
+    }
+
+    .company-info-container {
+      height: 100px;
+      position: relative;
+    }
+
+    .company-info {
+      position: absolute;
+      bottom: 0;
+      left: 8px;
+    }
+
+    .invoice-info {
+      display: block;
+      text-align: right;
+    }
+
+    .header h3 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .footer h2{
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .footer span{
+      font-weight: normal;
+    }
+
+    .company-detail p {
+      padding-bottom: 0px;
+      margin-bottom: 0px
+    }
+
+    .customer-info {
+      margin-top: 16px
+    }
+
+    .customer-info h4 {
+      font-size: 14px;
+      font-weight: normal;
+      text-transform: uppercase;
+    }
+
+    .header span {
+      font-size: 14px;
+      font-weight: normal;
+    }
+
+  </style>
 </head>
 
 <body>
-    <div class="section-header section-left">
-        <div class="content-padded">
-            <span class="normal-text">{{ order.billing_address.company_name }}</span>
-            <br />
-            <span class="normal-text">{{ order.billing_address.street_address_1 }}</span>
-            <br />
-            {% if order.billing_address.street_address_2 %}
-                <span class="normal-text">{{ order.billing_address.street_address_2 }}</span>
-                <br />
-            {% endif %}
-            <span class="normal-text">{{ order.billing_address.city }}</span>
-            <br />
-            <span class="normal-text">{{ order.billing_address.postal_code }}</span>
-            <br />
-            {% if order.billing_address.phone %}
-                <span class="normal-text">{{ order.billing_address.phone }}</span>
-                <br />
-            {% endif %}
-            <span class="normal-text">{{ order.get_customer_email }}</span>
-            <br />
+  <div class="header">
+    <div class="row" style="justify-content: space-between;">
+      <div class="col-8 company-detail">
+        <div class="row company-info-row">
+          <div>
+            <!-- maintain logo image aspect ratio -->
+            <img style="width:189px;height:100px;" src="https://mywheels-production.s3.ap-southeast-1.amazonaws.com/logo/cp_logo.png" />
+          </div>
+          <div class="col company-info-container">
+            <div class="company-info">
+              <h2>The China Press Berhad</h2>
+              <h3>Company Reg. no. 194701000047 (1508-X)</h3>
+              <h3>(Service Tax ID: W10-1808-32001095)</h3>
+            </div>
+          </div>
         </div>
+
+        <p>80, Jalan Riong, Off Jalan Bangsar, 59100 Kuala Lumpur</p>
+        <h3>Tel:&nbsp;&nbsp;<span>03-2289 6363 (General Line), 03-2289 6188 (Classified), 03-2289 6388 (Ad-Direct),
+            03-2289
+            6338
+            (Agency)</span></h3>
+        <h3>Fax:&nbsp;&nbsp;<span>03-2283 3519 (Account Dept)</span></h3>
+      </div>
+      <div class="col-4 invoice-info">
+        <h3>Invoice #:&nbsp;&nbsp;<span>{{ invoice.number }}</span></h3>
+        <h3>Invoice Date:&nbsp;&nbsp;<span>{{ creation_date }}</span></h3>
+        <h3>Order #:&nbsp;&nbsp;<span>{{ order.id }}</span></h3>
+        <h3>Agent:&nbsp;&nbsp;<span>{{ agent_name }}</span></h3>
+      </div>
     </div>
-    <div class="section-invoice-info section-right">
-        <div class="content-padded">
-            <span class="header-title">INVOICE INFORMATION</span>
-            <span class="header-category">Invoice number:</span>
-            <div class="padded-font-sm"></div>
-            <span class="header-item">{{ invoice.number }}</span>
-            <div class="padded-font"></div>
-            <span class="header-category">Order:</span>
-            <div class="padded-font-sm"></div>
-            <span class="header-item">{{ order.id }}</span>
-            <div class="padded-font"></div>
-            <span class="header-category">Date:</span>
-            <div class="padded-font-sm"></div>
-            <span class="header-item">{{ creation_date }}</span>
-            <div class="padded-font"></div>
-            <span class="header-category">Amount:</span>
-            <div class="padded-font-sm"></div>
-            <span class="header-item">{% price order.total_gross %}</span>
-        </div>
+    <div class="customer-info">
+      <h3>Bill To:</h3>
+      <h4>{{ order.billing_address.street_address_1 }}</h4>
+      {% if order.billing_address.street_address_2 %}
+      <h4>{{ order.billing_address.street_address_2 }}</h4>
+      {% endif %}
+      <h4>{{ order.billing_address.postal_code }},{{ order.billing_address.city }},{{ order.billing_address.country }}
+      </h4>
+      <h3>Email:&nbsp;&nbsp;<span>{{ order.get_customer_email }}</span></h3>
     </div>
-    <div class="section-left">
-        <div class="content-tight-padded padded-top">
-            <span class="header-title">BILLING ADDRESS</span>
-            <br />
-            <span class="normal-text">
-                {{ order.billing_address.first_name }}
-                {{ order.billing_address.last_name }}
-            </span>
-            <br />
-            <span class="normal-text">{{ order.billing_address.street_address_1 }}</span>
-            <br />
-            {% if order.billing_address.street_address_2 %}
-                <span class="normal-text">{{ order.billing_address.street_address_2 }}</span>
-                <br />
-            {% endif %}
-            <span class="normal-text">{{ order.billing_address.country }}</span>
-            <br />
-            <span class="normal-text">{{ order.billing_address.city }}</span>
-            <br />
-            <span class="normal-text">{{ order.billing_address.postal_code }}</span>
-            <br />
-            <span class="normal-text">{{ order.billing_address.phone }}</span>
-            <br />
-            <span class="normal-text">{{ order.get_customer_email }}</span>
-            <br />
-        </div>
-    </div>
-    <div class="section-right">
-        <div class="content-tight-padded padded-top">
-            <span class="header-title">SHIPMENT ADDRESS</span>
-            <br />
-            <span class="normal-text">
-                {{ order.shipping_address.first_name }}
-                {{ order.shipping_address.last_name }}
-            </span>
-            <br />
-            <span class="normal-text">{{ order.shipping_address.street_address_1 }}</span>
-            <br />
-            {% if order.shipping_address.street_address_2 %}
-                <span class="normal-text">{{ order.shipping_address.street_address_2 }}</span>
-                <br />
-            {% endif %}
-            <span class="normal-text">{{ order.shipping_address.country }}</span>
-            <br />
-            <span class="normal-text">{{ order.shipping_address.city }}</span>
-            <br />
-            <span class="normal-text">{{ order.shipping_address.postal_code }}</span>
-            <br />
-            <span class="normal-text">{{ order.shipping_address.phone }}</span>
-            <br />
-            <span class="normal-text">{{ order.user_email }}</span>
-            <br />
-        </div>
-    </div>
-    <div class="content-tight-padded">
-        <div class="content-separator">&nbsp;</div>
-    </div>
-    <div class="section-left">
-        <div class="content-tight-padded padded-top">
-            <span class="header-title">PAYMENT METHOD</span>
-            <br />
-            {% if order.get_last_payment %}
-                <span class="normal-text">{{ order.get_last_payment.gateway }}</span>
-            {% else %}
-                <span class="normal-text">Unpaid</span>
-            {% endif %}
-            <br />
-        </div>
-    </div>
-    <div class="section-right">
-        <div class="content-tight-padded padded-top">
-            <span class="header-title">SHIPMENT METHOD</span>
-            <br />
-            <span class="normal-text">{{ order.shipping_method_name }}</span>
-            <br />
-        </div>
-    </div>
-    <div class="content-tight-padded">
-        <div class="content-separator">&nbsp;</div>
-    </div>
+  </div>
+
+  <!-- <div class="item-table">
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Description</th>
+        <th scope="col">Quantity</th>
+        <th scope="col">Price (MYR)</th>
+      </tr>
+    </thead>
+</div> -->
+
+
+  <!-- <div class="content-padded">
+
+
+    <span class="normal-text">{{ order.billing_address.company_name }}</span>
+    <br />
+    <span class="normal-text">{{ order.billing_address.street_address_1 }}</span>
+    <br />
+    {% if order.billing_address.street_address_2 %}
+    <span class="normal-text">{{ order.billing_address.street_address_2 }}</span>
+    <br />
+    {% endif %}
+    <span class="normal-text">{{ order.billing_address.city }}</span>
+    <br />
+    <span class="normal-text">{{ order.billing_address.postal_code }}</span>
+    <br />
+    {% if order.billing_address.phone %}
+    <span class="normal-text">{{ order.billing_address.phone }}</span>
+    <br />
+    {% endif %}
+    <span class="normal-text">{{ order.get_customer_email }}</span>
+    <br />
+  </div> -->
+  </div>
+  <!-- <div class="section-invoice-info section-right">
     <div class="content-padded">
-        <span class="header-title">ITEMS ORDERED</span>
-        {% include "invoices/invoice_products_table.html" with products=products_first_page %}
-        {% if not rest_of_products|length %}
-            {% if products_first_page|length == 4 %}
-                <div class="page-break"></div>
-            {% endif %}
-            {% include "invoices/invoice_summary_table.html" with order=order %}
-        {% else %}
-            {% for product_set in rest_of_products %}
-                <div class="page-break"></div>
-                {% include "invoices/invoice_products_table.html" with products=product_set %}
-                {% if forloop.last %}
-                    {% if product_set|length > 11 %}
-                        <div class="page-break"></div>
-                    {% endif %}
-                    {% include "invoices/invoice_summary_table.html" with order=order %}
-                {% endif %}
-            {% endfor %}
-        {% endif %}
+      <span class="header-title">INVOICE INFORMATION</span>
+      <span class="header-category">Invoice number:</span>
+      <div class="padded-font-sm"></div>
+      <span class="header-item">{{ invoice.customer_note }}</span>
+      <div class="padded-font"></div>
+      <span class="header-category">Order:</span>
+      <div class="padded-font-sm"></div>
+      <span class="header-item">{{ order.id }}</span>
+      <div class="padded-font"></div>
+      <span class="header-category">Date:</span>
+      <div class="padded-font-sm"></div>
+      <span class="header-item">{{ creation_date }}</span>
+      <div class="padded-font"></div>
+      <span class="header-category">Amount:</span>
+      <div class="padded-font-sm"></div>
+      <span class="header-item">{% price order.total_gross %}</span>
     </div>
+  </div> -->
+  <!-- <div class="section-left">
+    <div class="content-tight-padded padded-top">
+      <span class="header-title">BILLING ADDRESS</span>
+      <br />
+      <span class="normal-text">
+        {{ order.billing_address.first_name }}
+        {{ order.billing_address.last_name }}
+      </span>
+      <br />
+      <span class="normal-text">{{ order.billing_address.street_address_1 }}</span>
+      <br />
+      {% if order.billing_address.street_address_2 %}
+      <span class="normal-text">{{ order.billing_address.street_address_2 }}</span>
+      <br />
+      {% endif %}
+      <span class="normal-text">{{ order.billing_address.country }}</span>
+      <br />
+      <span class="normal-text">{{ order.billing_address.city }}</span>
+      <br />
+      <span class="normal-text">{{ order.billing_address.postal_code }}</span>
+      <br />
+      <span class="normal-text">{{ order.billing_address.phone }}</span>
+      <br />
+      <span class="normal-text">{{ order.get_customer_email }}</span>
+      <br />
+    </div>
+  </div>
+  <div class="section-right">
+    <div class="content-tight-padded padded-top">
+      <span class="header-title">SHIPMENT ADDRESS</span>
+      <br />
+      <span class="normal-text">
+        {{ order.shipping_address.first_name }}
+        {{ order.shipping_address.last_name }}
+      </span>
+      <br />
+      <span class="normal-text">{{ order.shipping_address.street_address_1 }}</span>
+      <br />
+      {% if order.shipping_address.street_address_2 %}
+      <span class="normal-text">{{ order.shipping_address.street_address_2 }}</span>
+      <br />
+      {% endif %}
+      <span class="normal-text">{{ order.shipping_address.country }}</span>
+      <br />
+      <span class="normal-text">{{ order.shipping_address.city }}</span>
+      <br />
+      <span class="normal-text">{{ order.shipping_address.postal_code }}</span>
+      <br />
+      <span class="normal-text">{{ order.shipping_address.phone }}</span>
+      <br />
+      <span class="normal-text">{{ order.user_email }}</span>
+      <br />
+    </div>
+  </div> -->
+  <!-- <div class="content-tight-padded">
+    <div class="content-separator">&nbsp;</div>
+  </div>
+  <div class="section-left">
+    <div class="content-tight-padded padded-top">
+      <span class="header-title">PAYMENT METHOD</span>
+      <br />
+      {% if order.get_last_payment %}
+      <span class="normal-text">{{ order.get_last_payment.gateway }}</span>
+      {% else %}
+      <span class="normal-text">Unpaid</span>
+      {% endif %}
+      <br />
+    </div>
+  </div>
+  <div class="section-right">
+    <div class="content-tight-padded padded-top">
+      <span class="header-title">SHIPMENT METHOD</span>
+      <br />
+      <span class="normal-text">{{ order.shipping_method_name }}</span>
+      <br />
+    </div>
+  </div> -->
+  <!-- <div class="content-tight-padded">
+    <div class="content-separator">&nbsp;</div>
+  </div> -->
+  <div class="content-padded">
+    {% include "invoices/invoice_products_table.html" with products=products_first_page %}
+    <div></div>
+    {% include "invoices/invoice_summary_table.html" with order=order total_discount=total_discount tax_amount=tax_amount total_amount=total_amount subtotal_amount=subtotal_amount %}
+  </div>
+  <!-- <h2 class="footer">This is a computer generated invoice. No signature is required.</h2> -->
+  <div class="footer">
+    <!-- {% if order.get_last_payment %}
+    <h2>Payment Method:&nbsp;&nbsp;<span>{{ order.get_last_payment.gateway }}</span></h2>
+    {% else %}
+    <span class="normal-text">Unpaid</span>
+    {% endif %}
+
+    <h2>Payment Reference Number:&nbsp;&nbsp;<span></span></h2> -->
+    <h2>This is a computer generated invoice. No signature is required.</h2>
+  </div>
 </body>
 
 </html>

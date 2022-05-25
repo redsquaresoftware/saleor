@@ -372,6 +372,14 @@ class DraftOrderDelete(ModelDeleteMutation):
         error_type_field = "order_errors"
 
     @classmethod
+    @traced_atomic_transaction()
+    def perform_mutation(cls, _root, info, **data):
+        order = cls.get_instance(info, **data)
+        response = super().perform_mutation(_root, info, **data)
+        transaction.on_commit(lambda: info.context.plugins.draft_order_deleted(order))
+        return response
+
+    @classmethod
     def clean_instance(cls, info, instance):
         if instance.status != OrderStatus.DRAFT:
             raise ValidationError(
@@ -382,14 +390,6 @@ class DraftOrderDelete(ModelDeleteMutation):
                     )
                 }
             )
-
-    @classmethod
-    @traced_atomic_transaction()
-    def perform_mutation(cls, _root, info, **data):
-        order = cls.get_instance(info, **data)
-        response = super().perform_mutation(_root, info, **data)
-        transaction.on_commit(lambda: info.context.plugins.draft_order_deleted(order))
-        return response
 
 
 class DraftOrderComplete(BaseMutation):

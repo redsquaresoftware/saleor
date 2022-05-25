@@ -9380,6 +9380,55 @@ def test_product_variant_without_price_by_sku_as_app_with_permission(
     """
     variant.channel_listings.all().delete()
     variant.channel_listings.create(channel=channel_USD)
+
+    variables = {"sku": variant.sku, "channel": channel_USD.slug}
+    response = app_api_client.post_graphql(
+        query,
+        variables,
+        permissions=[permission_manage_products],
+        check_no_permissions=False,
+    )
+    content = get_graphql_content(response)
+    assert not content["data"]["productVariant"]
+
+
+def test_product_variant_without_price_by_sku_as_app_without_permission(
+    app_api_client,
+    variant,
+    channel_USD,
+):
+    query = """
+        query getProductVariant($sku: String!, $channel: String) {
+            productVariant(sku: $sku, channel: $channel) {
+                id
+                name
+                sku
+            }
+        }
+    """
+    variant.channel_listings.all().delete()
+    variant.channel_listings.create(channel=channel_USD)
+
+    variables = {"sku": variant.sku, "channel": channel_USD.slug}
+    response = app_api_client.post_graphql(query, variables)
+    content = get_graphql_content(response)
+    assert not content["data"]["productVariant"]
+
+
+def test_product_variant_without_price_by_sku_as_user(
+    user_api_client, variant, channel_USD
+):
+    query = """
+        query getProductVariant($sku: String!, $channel: String) {
+            productVariant(sku: $sku, channel: $channel) {
+                id
+                name
+                sku
+            }
+        }
+    """
+    variant.channel_listings.all().delete()
+    variant.channel_listings.create(channel=channel_USD)
     variant_id = graphene.Node.to_global_id("ProductVariant", variant.id)
 
     variables = {"sku": variant.sku, "channel": channel_USD.slug}
