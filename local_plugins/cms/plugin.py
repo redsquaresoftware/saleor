@@ -71,7 +71,7 @@ def process_order_on_django(order_id):
             if product_type == PRODUCT_TYPE_ADS_PACKAGE:
 
                 # preprocessing
-                ads_number, ads_create_duration = get_attributes_from_product(product)
+                ads_number, ads_create_duration, ads_display_name = get_attributes_from_product(product)
 
                 start_date, end_date = calculate_start_and_end_date(ads_create_duration)
 
@@ -87,6 +87,7 @@ def process_order_on_django(order_id):
                     ads_number=ads_number,
                     is_unlimited_ads=is_unlimited_ads,
                     quantity=line.quantity,
+                    display_name=ads_display_name,
                 )
 
             elif product_type == PRODUCT_TYPE_ADD_ON:

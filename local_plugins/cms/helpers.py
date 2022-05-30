@@ -11,6 +11,7 @@ from .constants import *
 def get_attributes_from_product(product):
     ads_number = None
     ads_create_duration = None
+    ads_display_name = None
 
     # get values for number of ads & ads-create duration from the
     # product attributes
@@ -29,8 +30,11 @@ def get_attributes_from_product(product):
         if name == ATTRIBUTE_DURATION:
             ads_create_duration = value
 
+        if name == ATTRIBUTE_DISPLAY_NAME:
+            ads_display_name = value
+
     # return all values retrieved
-    return ads_number, ads_create_duration
+    return ads_number, ads_create_duration, ads_display_name
 
 
 # this is a function meant for calculating start & end date for ads package only
