@@ -22,15 +22,23 @@ def send_graphql_request(query, variables):
 
 
 def create_ads_package(
-    name, email, order_id, start_date, end_date, ads_number, is_unlimited_ads, quantity,
+    name, 
+    email, 
+    order_id, 
+    start_date, 
+    end_date, 
+    ads_number, 
+    is_unlimited_ads, 
+    quantity,
+    display_name
 ):
     print(
         f"Sending Ads Package Create request to Django - Email: {email} | OrderID: {order_id}"
     )
 
     query = """
-        mutation params($name: String!, $email: String!, $orderId: ID!, $startDate: DateTime!, $endDate: DateTime!, $adsNumber: Int, $isUnlimitedAds: Boolean, $quantity: Int!) {
-            createAdsPackage(input: { name: $name, email: $email, orderId: $orderId, startDate: $startDate, endDate: $endDate, adsNumber: $adsNumber, isUnlimitedAds: $isUnlimitedAds, quantity: $quantity }) {
+        mutation params($name: String!, $email: String!, $orderId: ID!, $startDate: DateTime!, $endDate: DateTime!, $adsNumber: Int, $isUnlimitedAds: Boolean, $quantity: Int!, $displayName: String) {
+            createAdsPackage(input: { name: $name, email: $email, orderId: $orderId, startDate: $startDate, endDate: $endDate, adsNumber: $adsNumber, isUnlimitedAds: $isUnlimitedAds, quantity: $quantity, displayName: $displayName }) {
                 ok
                 error
             }
@@ -45,6 +53,7 @@ def create_ads_package(
         "adsNumber": ads_number,
         "isUnlimitedAds": is_unlimited_ads,
         "quantity": quantity,
+        "displayName": display_name
     }
 
     result = send_graphql_request(query, variables)
